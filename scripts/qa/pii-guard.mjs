@@ -271,7 +271,7 @@ export function scanText(rel, text, ctx) {
   const barePhones = BARE_PHONE_FILES.test(rel), jsPhones = JS_FILES.test(rel);
   lines.forEach((line, i) => {
     const seenE = new Set(), seen = new Set();
-    const phone = (a, b, c, src, m) => { const d = a + b + c; if (seen.has(d) || b === "555" || ctx.allow.phone.has(d)) return; if (m && NOT_PHONE.has(d) && notPhoneCtx(src, m.index, m[0])) return; seen.add(d); add("phone", d, i); };
+    const phone = (a, b, c, src, m) => { const d = a + b + c; if (seen.has(d) || b === "555" || ctx.allow.phone.has(d)) return; if (m && /^["'`]?\d{10}["'`]?$/.test(m[0]) && ctx.allow.id.has(sha16(d))) return; if (m && NOT_PHONE.has(d) && notPhoneCtx(src, m.index, m[0])) return; seen.add(d); add("phone", d, i); };
     for (const src of decLines[i] === line ? [line] : [line, decLines[i]]) { /* PIIGUARD3: also the %XX/NFKC-decoded line */
       const decoded = src.replace(/%40/gi, "@").replace(/&#0*64;?/g, "@").replace(/&#x0*40;?/gi, "@").replace(/&commat;/gi, "@");
       for (const m of decoded.matchAll(EMAIL)) { const v = m[0].toLowerCase(); if (seenE.has(v)) continue; seenE.add(v); if (!SAFE_EMAIL_DOMAIN.test(v) && !ctx.allow.email.has(v)) add("email", m[0], i); }

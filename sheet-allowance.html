@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="ward-money" content="dad" /><!-- DAYPKG1 v2g · the one Dad money sheet: house-money-bind paints '$' and kids-data marks dad-device:v1 only on a page with this tag -->
 <script src="house-hub.js?v=HUBPAIR1"></script>
-<script src="private-feed.js?v=HUBPAIR1D"></script>
+<script src="private-feed.js?v=R53AR1"></script>
 <script src="school-names.js?v=SUNHOME1"></script>
 <script src="house-nomoney.js?v=DAYPKG1"></script>
 <script src="house-face-law.js?v=FACESTRIP1"></script>
@@ -506,7 +506,7 @@
 <script>(function(){var h=document.documentElement;h.classList.add("ori-on");try{var sw=Math.min(screen.width||0,screen.height||0);if(sw&&sw<=600){h.classList.add("ori-phone");var v=document.querySelector('meta[name="viewport"]');if(v)v.setAttribute("content","width=device-width, initial-scale=1, viewport-fit=cover");}}catch(e){}})();</script>
 <link rel="stylesheet" href="house-ori.css?v=ORIHOME18" />
 <link rel="stylesheet" href="night/night-host.css?v=SUNHOME1" />
-<link rel="stylesheet" href="month-theme/month-overlay.css?v=SUNHOME2" />
+<link rel="stylesheet" href="month-theme/month-overlay.css?v=PASS2X1" />
 <script src="house-face-law.js?v=FACESTRIP1"></script><!-- LIVELAW1 · Dan face laws (colour/dress-up days, ended rows, em dashes) before any board renders -->
 <style id="p1fix-money-rows">
 /* P1FIX B40 · jar chore rows readable on the dark glass. Selectors carry html.ori-on + body.allow-shell and the fill colour is
@@ -525,8 +525,10 @@ html body.allow-shell .kid-chip.hayes,html.ori-on body.allow-shell .kid-chip.hay
 html body.allow-shell .kid-chip.harris,html.ori-on body.allow-shell .kid-chip.harris{background:#2a5aa8!important;border:1px solid rgba(255,255,255,.35)!important;color:#fff!important;-webkit-text-fill-color:#fff!important}
 </style>
 <link rel="stylesheet" href="wg-glass.css?v=HOTFIX1" />
+<link id="prism-face-css" rel="stylesheet" href="prism-face.css">
 </head>
 <body data-clear-label="CLEARED" data-chores-shared="1" data-theme="house" class="allow-shell">
+<a class="wardos-home" href="sheet-index.html" data-kw-home aria-label="Home"><img src="assets/icons/home-key-light.svg" alt="" width="64" height="64"></a>
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
   <defs>
     <!-- Shared paints · HEAT v3 cyan+gold -->
@@ -807,8 +809,8 @@ html body.allow-shell .kid-chip.harris,html.ori-on body.allow-shell .kid-chip.ha
  </div>
  <div class="star-count">
  <div class="star-big" data-noscore="1">Jar</div><!-- AINSNOSCORE2 · her jar is EMPTY/TRUSTED only: no icon tally, no number, before or after data -->
- <div class="star-label">Nothing trusted yet.</div>
- <div class="jar-state" data-jar-state="unset">Nothing trusted yet.</div><!-- AINSJAR1 · a grant sentence or this empty line, never a counter -->
+ <div class="star-label">Jar is empty</div>
+ <div class="jar-state" data-jar-state="unset">Jar is empty</div><!-- AINSJAR1 · a grant sentence or this empty line, never a counter -->
  </div>
  <div class="feed">
  <div class="feed-title">Musts that fill the jar</div>
@@ -885,6 +887,7 @@ html body.allow-shell .kid-chip.harris,html.ori-on body.allow-shell .kid-chip.ha
 </div>
 <script src="house-clock.js?v=LIVEWX2"></script>
 <script src="house-tapsync.js?v=P1FIX"></script>
+<script src="house-event-display.js?v=ACERFIX1"></script>
 <script src="kids-data.js?v=DAYPKG1"></script>
 <script src="house-saves.js?v=DAYPKG1"></script>
 <script src="ains-jar-state.js?v=AINSJAR2"></script>
@@ -918,18 +921,27 @@ document.addEventListener("DOMContentLoaded", function () {
   else wire();
 })();
 </script>
-<script src="house-fresh.js?v=JARTAP1D2"></script>
+<script src="wardos-stage.js?v=ACERFIX1"></script>
+<script src="house-fresh.js?v=R53AR1"></script>
 <script src="house-hdr-home.js?v=MUTEHIT1"></script>
 <script src="house-links.js?v=DAYPKG1"></script>
 <script>/* DAYPKG1 v2e · this page's tap rules (were in house-links.js): "*" runs only here, because only this page adds them */
 (function () { var L = window.HouseLinks; if (!L || !L.rules || !L.kid) return;
-  L.rules.push(["*", "section.link-banner", "sheet-chores.html"], ["*", "section.bank, .streak-pill, .g2-grow-chip", L.kid(null)], ["*", ".feed-row", "sheet-chores.html"], ["*", ".desk-note, .badge", "sheet-desk-gate.html"]); })();
+  L.rules.push(["*", "section.link-banner", "sheet-chores.html"], ["*", "section.bank, .streak-pill, .g2-grow-chip", L.kid(null)], ["*", ".feed-row", "sheet-chores.html"], ["*", ".desk-note, .badge", "sheet-index.html"]); })();
 </script>
 <script src="ori/plates/painted/manifest.js?v=ORIHOME18"></script>
 <script src="ori/ori-scene.js?v=ORIHOME18"></script>
 <script src="house-ori-world.js?v=DAYPKG1"></script>
 <script src="night/night-host.js?v=BGONCE1" defer></script>
-<script src="month-theme/season-math.js?v=SUNHOME1" defer></script><script src="month-theme/month-overlay.js?v=SUNHOME2" defer></script>
+<script src="month-theme/season-math.js?v=SUNHOME1" defer></script><script src="month-theme/month-overlay.js?v=PASS2X1" defer></script>
 <link rel="stylesheet" href="wall-board-sheets.css?v=WALLSHEET1" />
+<script id="prism-face-js" src="prism-face.js"></script>
+<style id="pass1-r2-allowance-wall">
+@media (min-width: 1400px) {
+  html:not(#hf-wall-off) body .link-banner {
+    overflow: visible !important; min-height: 104px !important; height: auto !important;
+  }
+}
+</style>
 </body>
 </html>

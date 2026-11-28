@@ -91,7 +91,8 @@
   var world = null;
   var O = window.OriScene;
   /* The phone shows cover-fit painted plates. WebGL's tall crop left a black edge. */
-  if (!phoneLayout && !FORCE_CSS && O && O.World) {
+  function mountWorld() {
+    if (phoneLayout || FORCE_CSS || !O || !O.World) return;
     try {
       world = new O.World(host, {
         plates: "ori/plates/",
@@ -125,6 +126,7 @@
     } catch (err) {
       try { console.info("[house-ori] world failed", err); } catch (e2) {}
       world = null;
+      document.documentElement.classList.add("ori-nogl");
     }
   }
 
@@ -314,6 +316,7 @@
     };
   }
 
+  function bindWorld() {
   if (world && world.S) {
     document.documentElement.classList.add("ori-gl");
     world.exposure = HOME ? 2.05 : 1.45;
@@ -401,6 +404,17 @@
   } else {
     document.documentElement.classList.add("ori-nogl");
   }
+  }
+  function bootWorld() {
+    mountWorld();
+    bindWorld();
+  }
+  function deferWorld() {
+    function go() { requestAnimationFrame(function () { setTimeout(bootWorld, 0); }); }
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go, { once: true });
+    else go();
+  }
+  deferWorld();
 
   /* CSS forest travels with the page even when the painted world is down. */
   if (HOME) {
@@ -1071,7 +1085,7 @@
     if (el) el.classList.add("ori-portal-hot");
     var gone = false;
     function go() { if (gone) return; gone = true; location.href = url; }
-    if (REDUCED) { go(); return; }
+    if (REDUCED || document.documentElement.hasAttribute("data-wardos-stage")) { go(); return; }
     try {
       var pre = document.createElement("link");
       pre.rel = "prefetch";
@@ -1088,8 +1102,8 @@
       try { world.camPush(1.26, 0.6, x / Math.max(1, innerWidth), y / Math.max(1, innerHeight), 0.25); } catch (e) {}
       try { world.exit({ to: [x, y], dur: 0.6 }).then(go); } catch (e) {}
     }
-    fadeCover(iris, 0, 1, 540, go);
-    setTimeout(go, 800);
+    fadeCover(iris, 0, 1, 200, go);
+    setTimeout(go, 250);
   }
 
   var SKIP = "button,input,select,textarea,label,summary,[data-sp-act],[data-sp-tile],[data-layout],.leaveby-chip,[data-check],.hub-sw,.hub-sw-rocker,.hub-sw-track,.hub-sw-dim,[data-hub-key-entry],[data-mute-toggle],.sctl,.quest,.chore,[contenteditable=true]";
@@ -1112,6 +1126,10 @@
   }
   function onActivate(ev, fromKey) {
     if (diving) return;
+    /* Home is a real link. Cancelling the click and assigning location again
+       was the ~1.8s press-to-request outlier. Leave this tap to the browser. */
+    var home = ev.target && ev.target.closest && ev.target.closest("a.wardos-home, a.hub-home, a[data-kw-home]");
+    if (home && home.getAttribute("href")) return;
     /* Earlier capture listeners own this tap (NEED KEY opens the paste box, never a modal from us). */
     if (ev.defaultPrevented) return;
     if (!fromKey && (ev.button || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey)) return;
@@ -1222,6 +1240,11 @@
     });
   }
   window.addEventListener("pagehide", function () {
+    /* Release the WebGL context before the next board commits. Leaving it for GC stalls SwiftShader past the Home commit budget. Not on the press: that held the request. */
+    if (world) {
+      try { world.destroy(); } catch (eGl) {}
+      world = null;
+    }
     stampVeil();
     var iris = document.querySelector(".ori-iris");
     if (iris) {
@@ -1246,6 +1269,7 @@
       document.documentElement.classList.remove("ori-held");
     }
     if (ev.persisted && world) { world.trans = null; try { world.kick(true); } catch (e) {} }
+    if (ev.persisted && !world) bootWorld();
   });
 
   function mountMonthAgenda() {

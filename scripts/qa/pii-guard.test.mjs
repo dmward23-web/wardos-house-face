@@ -353,6 +353,7 @@ test("phones F4: tel:+1, formatted and keyed int-limit-shaped numbers are caught
 test("phones F4: bare int limits in z-index / numeric context stay clean", () => {
   const I = ["214", "748", "3647"].join(""), U = ["429", "496", "7295"].join("");
   clean(one("a.js", `el.style.zIndex = "${I}";\nvar m = x % "${U}";\n`));
+  caught(one("a.js", `h.replace("String(2 ** 31 - 1)", "${["202", "416", "0199"].join("")}");\n`), "phone");
   clean(one("a.html", `<div style="z-index: ${I}">x</div>\n`));
   caught(one("a.html", `<td>${I}</td>\n`), "phone"); /* element text is not a numeric context */
   caught(one("a.js", `var m = '${U}';\n`), "phone");  /* PIIGUARD4: a plain assignment is not a numeric context */

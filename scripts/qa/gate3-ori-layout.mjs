@@ -224,7 +224,9 @@ const SCAN = `(() => {
   scrollTo(0, 0);
   if (document.documentElement.classList.contains("ori-phone") && document.getElementById("hub-cam-deck")) {
     const marks = [];
-    ["header.hdr", "#hub-cam-deck", ".leaveby", "#hub-lights-panel", "#hub-spotify-strip", ".who-up"].forEach((sel) => {
+    const lightsBar = document.getElementById("hub-lights-panel");
+    if (lightsBar && shown(lightsBar)) hits.push("lights bar visible");
+    ["header.hdr", "#hub-cam-deck", ".leaveby", "#hub-spotify-strip", ".who-up"].forEach((sel) => {
       const el = document.querySelector(sel);
       if (!el || !shown(el)) return;
       const r = el.getBoundingClientRect();
@@ -247,7 +249,7 @@ const SCAN = `(() => {
     if (canvas) {
       const ctx = canvas.getContext("2d");
       const pr = canvas.getBoundingClientRect();
-      document.querySelectorAll("header.hdr, #hub-cam-deck, .leaveby, #hub-lights-panel, #hub-spotify-strip, .who-up, .tile-grid > .tile").forEach((el) => {
+      document.querySelectorAll("header.hdr, #hub-cam-deck, .leaveby, #hub-spotify-strip, .who-up, .tile-grid > .tile").forEach((el) => {
         if (!shown(el)) return;
         const r = el.getBoundingClientRect();
         const samples = [
@@ -636,6 +638,8 @@ async function prepare(page, file) {
 }
 
 async function main() {
+  const head = spawnSync("git", ["rev-parse", "HEAD"], { cwd: path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../.."), encoding: "utf8" });
+  console.log("GATE3 head", (head.stdout || "").trim());
   const server = await startServer();
   const browser = await puppeteer.launch({
     executablePath: chromePath(),
@@ -681,6 +685,29 @@ async function main() {
     for (const view of process.env.GATE3_KID_ONLY === "1" ? [] : views) {
       const page = await browser.newPage();
       await page.setViewport(view);
+      await page.evaluateOnNewDocument((strip) => {
+        window.__veilLog = [];
+        const sample = () => {
+          if (window.__veilLog.length >= 600) return;
+          if (strip) document.querySelectorAll(".ori-iris, .ori-arrive").forEach((el) => el.remove());
+          let best = null;
+          document.querySelectorAll(".ori-iris, .ori-arrive").forEach((el) => {
+            const op = parseFloat(getComputedStyle(el).opacity) || 0;
+            if (!best || op > best.op) best = { op: op, calm: el.getAttribute("data-calm"), fade: el.getAttribute("data-calm-fade"), veil: el.getAttribute("data-ori-veil"), name: el.className };
+          });
+          const row = { t: Math.round(performance.now()), present: !!best, op: best ? best.op : 0, calm: best ? best.calm : null, fade: best ? best.fade : null, veil: best ? best.veil : null, name: best ? best.name : "" };
+          const prev = window.__veilLog[window.__veilLog.length - 1];
+          if (!prev || prev.present !== row.present || prev.op !== row.op || prev.calm !== row.calm || prev.fade !== row.fade || prev.veil !== row.veil) window.__veilLog.push(row);
+        };
+        const mo = new MutationObserver(sample);
+        const watch = () => {
+          if (document.documentElement) mo.observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ["style", "class"] });
+        };
+        watch();
+        document.addEventListener("DOMContentLoaded", watch);
+        const loop = () => { sample(); if (window.__veilLog.length < 600) requestAnimationFrame(loop); };
+        requestAnimationFrame(loop);
+      }, process.env.GATE3_STRIP_VEIL === "1");
       if (view.phone) {
         await page.evaluateOnNewDocument(() => {
           function arm() {
@@ -763,9 +790,32 @@ async function main() {
             else console.log("  veil", where, mid.op.toFixed(2), "in", Date.now() - t0 + "ms");
             return;
           }
-          return veilRead().then((mid) => {
-            if (!veilOk(mid)) failures.push("phone veil missing " + where + " " + JSON.stringify(mid));
-            else console.log("  veil", where, mid.op.toFixed(2));
+          return page.evaluate(() => new Promise((res) => {
+            /* Count frames, not wall-clock milliseconds. On a throttled runner the first animation
+               callback can already be later than 700 ms, which used to return the log while the iris
+               was still in its 160 ms hold. The fade is the later sample. */
+            let n = 0;
+            const faded = () => {
+              const log = window.__veilLog || [];
+              const held = log.find((r) => r.present && r.op >= 0.35 && r.veil === "1" && r.calm == null);
+              if (!held) return false;
+              return log.some((r) => r.t > held.t && (!r.present || r.op < held.op - 0.15));
+            };
+            const step = () => {
+              n += 1;
+              if (faded() || n >= 40) return res(window.__veilLog || []);
+              requestAnimationFrame(step);
+            };
+            requestAnimationFrame(step);
+          })).then((log) => {
+            /* data-calm stays null. That attribute is the leave iris from house-ori-calm.js, and location.replace
+               starts a fresh document. The arrive veil is data-ori-veil, held near opacity 1, then faded. The log
+               is taken from first paint, so a slow gate read cannot miss the 160 ms hold. */
+            const rows = Array.isArray(log) ? log : [];
+            const held = rows.filter((r) => r.present && r.op >= 0.35 && r.veil === "1" && r.calm == null);
+            const fade = rows.findIndex((r, i) => i > 0 && held.length && r.t > held[0].t && (!r.present || r.op < held[0].op - 0.15));
+            console.log("  veil", where, "iris hold/fade (e)", "log", rows.length, "held", held.length, "calm=null", "fadeAt", fade);
+            if (!held.length || fade < 0) failures.push("phone veil missing " + where + " log " + JSON.stringify({ n: rows.length, held: held.length, fade: fade, tail: rows.slice(-3) }));
           });
         }
         function veilRead() {
@@ -777,7 +827,7 @@ async function main() {
               const s = getComputedStyle(el);
               const op = parseFloat(s.opacity) || 0;
               const r = el.getBoundingClientRect();
-              if (!best || op > best.op) best = { op: op, w: r.width, h: r.height, display: s.display, name: el.className };
+              if (!best || op > best.op) best = { op: op, w: r.width, h: r.height, display: s.display, name: el.className, fade: el.getAttribute("data-calm-fade"), calm: el.getAttribute("data-calm"), veil: el.getAttribute("data-ori-veil") };
             });
             if (best && best.op >= 0.35) return best;
             if (held) return { op: 1, w: innerWidth, h: innerHeight, display: "pseudo", name: "held" };
@@ -811,6 +861,14 @@ async function main() {
         await veilAt("arrive-lights");
       }
       await page.close();
+    }
+    if (process.env.GATE3_VEIL_ONLY === "1") {
+      if (failures.length) {
+        console.log("GATE 3 FAIL " + failures.length);
+        for (const f of failures) console.log(" - " + f);
+        process.exitCode = 1;
+      } else console.log("GATE 3 PASS");
+      return;
     }
     /* FOLLOWUP3 · kid pages on phones, unpaired: the pairing chip must not cover any visible control or text
        (name, sound toggle, clock). Only what is really on top at that point counts (hit test). */

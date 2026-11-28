@@ -135,7 +135,17 @@
     }
   }
 
-  function shortPlace(summary, cap) {
+  function shortPlace(ev, cap) {
+    var summary = typeof ev === "string" ? ev : String((ev && (ev.summary || ev.place || ev.what)) || "");
+    var D = global.HouseEventDisplay;
+    if (D && typeof D.summarize === "function") {
+      /* The page sets WardosAudience (sheet-dan.html sets "adult"). The strip does not read the URL. */
+      var who = global.WardosAudience || "shared";
+      var event = typeof ev === "string" ? { summary: ev, title: ev, what: ev } : ev;
+      if (event && !event.summary && summary) { event.summary = summary; event.title = event.title || summary; event.what = event.what || summary; }
+      var view = D.summarize(event, who);
+      return view && view.title ? view.title : "";
+    }
     var s = kidsSafe(String(summary || "").trim());
     s = s.replace(/^Leave\s*[·•\-–—]\s*/i, "");
     s = s.replace(/\(\s*Mom[^)]*\)/gi, "");
@@ -209,9 +219,20 @@
     if (AF && AF.hasMonths && AF.hasMonths() && !AF.keepItem(e, AF.now())) return false;
     return true;
   }
+  function wallMs() {
+    try { if (global.HouseScene && HouseScene.now) return HouseScene.now().getTime(); } catch (e) { /* real clock */ }
+    return Date.now();
+  }
   function listEvents(cal) {
     var l = (cal && (cal.upcomingLeaves || cal.events)) || [];
-    return l.filter(function (e) { return !(e && SOFT_TITLE.test(String(e.summary || e.title || ""))) && lawOk(e); }); /* LAW8C1 + LIVELAW1 + AWAYLAW1 · AWAYONE1 */
+    return l.filter(function (e) {
+      if (!e || SOFT_TITLE.test(String(e.summary || e.title || ""))) return false;
+      if (!lawOk(e)) return false;
+      var D = global.HouseEventDisplay;
+      if (D && D.isDenied && D.isDenied(e)) return false;
+      if (D && typeof D.summarize === "function" && !shortPlace(e)) return false;
+      return true;
+    }); /* LAW8C1 + LIVELAW1 + AWAYLAW1 · AWAYONE1 · ACERFIX clinical rows never reach glass */
   }
 
   /** First future event by start (> now). */
@@ -320,17 +341,16 @@
         timeZone: "America/Chicago", weekday: "short"
       }).format(new Date(startMs));
     } catch (e2) { /* keep */ }
-    var place = shortPlace(ev.summary || ev.place || "", ev._merged ? 120 : 64);
-    var time = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "");
+    var place = shortPlace(ev, ev._merged ? 120 : 64);
+    var time = ev.allDay ? "All day" : (clockTimeFromIso(ev.start) || "");
+    if (!place) place = "Calendar item";
     return {
       label: isToday ? "Schedule · today" : ("Schedule · " + dow),
       _dayIso: startIsoDay,
       _dow: dow,
-      time: time === "day" ? "" : time,
+      time: time === "All day" ? "" : time,
       place: place,
-      detailHtml: "<strong>" + esc(time) + "</strong> " +
-        esc(place) +
-        (ev.location ? (" · " + esc(String(ev.location).split(",")[0])) : ""),
+      detailHtml: "<strong>" + esc(time) + "</strong> " + esc(place),
       badge: isToday ? clock.dow : dow
     };
   }
@@ -412,7 +432,7 @@
   }
 
   function pickStripFromCal(cal, clock) {
-    var next = mergeSameStart(cal, pickNextFuture(cal, Date.now()));
+    var next = mergeSameStart(cal, pickNextFuture(cal, wallMs()));
     var strip = next
       ? stripFromEvent(next, clock)
       : {
@@ -422,9 +442,9 @@
           detailHtml: "No upcoming events in cal-live window",
           badge: clock.dow
         };
-    strip.today = remainingToday(cal, clock, Date.now());
+    strip.today = remainingToday(cal, clock, wallMs());
     strip.tomorrow = tomorrowPeek(cal, clock);
-    strip.future = futureLeaves(cal, Date.now(), 10);
+    strip.future = futureLeaves(cal, wallMs(), 10);
     return strip;
   }
 
@@ -627,7 +647,7 @@
   }
 
   function rowHtml(ev, isNext) {
-    var title = shortPlace(ev.summary || ev.place || "");
+    var title = shortPlace(ev);
     var timeLab = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "");
     var cls = "leaveby-row" + (isNext ? " is-next" : "") + (ev.allDay ? " is-allday" : "");
     return '<li class="' + cls + '">' +
@@ -636,6 +656,97 @@
       "</li>";
   }
 
+  /* TODAYFIT1 · the Today header stays off the kid chips, and only whole rows that sit
+     inside the panel and above Musts/Jar/Days stay up. The rest are one "+N more" line. */
+  function scheduleTodayFit() {
+    fitTodayPanel();
+    if (typeof requestAnimationFrame === "function") {
+      requestAnimationFrame(function () { fitTodayPanel(); requestAnimationFrame(fitTodayPanel); });
+    }
+    if (document.fonts && document.fonts.ready && document.fonts.ready.then) document.fonts.ready.then(fitTodayPanel);
+  }
+  function fitTodayPanel() {
+    var todayEl = document.querySelector("[data-live='leaveby-today']");
+    if (!todayEl || !/sheet-today\.html$/i.test(String(location.pathname || ""))) return;
+    var panel = todayEl.closest("section.today-day") || todayEl.closest("section");
+    if (!panel) return;
+    var rows = [].slice.call(todayEl.querySelectorAll("li.leaveby-row"));
+    var total = rows.length;
+    var stale = todayEl.querySelector(".leaveby-more");
+    if (stale && stale.parentNode) stale.parentNode.removeChild(stale);
+    for (var i = 0; i < rows.length; i++) rows[i].hidden = false;
+    panel.style.marginTop = "0px";
+    var chips = document.querySelectorAll("a.kchip");
+    var hdr = panel.querySelector(".sec-hdr");
+    function rect(el) { return el.getBoundingClientRect(); }
+    function over(a, b) {
+      return a.width > 0 && b.width > 0 && a.left < b.right - 0.5 && a.right > b.left + 0.5 && a.top < b.bottom - 0.5 && a.bottom > b.top + 0.5;
+    }
+    if (hdr && chips.length) {
+      var push = 0;
+      var hr = rect(hdr);
+      for (var c = 0; c < chips.length; c++) {
+        var cr = rect(chips[c]);
+        if (over(hr, cr)) push = Math.max(push, cr.bottom - hr.top + 8);
+      }
+      if (push) panel.style.marginTop = push + "px";
+    }
+    var rail = document.querySelector("nav[aria-label='Musts Jar Days']");
+    function setMore(n) {
+      var more = todayEl.querySelector(".leaveby-more");
+      if (!n) { if (more && more.parentNode) more.parentNode.removeChild(more); return; }
+      if (!more) {
+        more = document.createElement("li");
+        more.className = "leaveby-more";
+        todayEl.appendChild(more);
+      }
+      more.textContent = "+" + n + " more";
+    }
+    function rowOut(el) {
+      if (!el || el.hidden) return false;
+      var r = rect(el);
+      if (r.height < 1) return false;
+      var list = rect(todayEl);
+      var pb = rect(panel);
+      var railTop = rail ? rect(rail).top : 1e9;
+      if (r.top < list.top - 0.5 || r.bottom > list.bottom + 0.5) return true;
+      if (r.top < pb.top - 0.5 || r.bottom > pb.bottom + 0.5) return true;
+      if (r.bottom > railTop + 0.5) return true;
+      return false;
+    }
+    function crosses() {
+      /* The list box is already the clipped viewport. A row past that edge, or
+         scrollHeight past clientHeight, is the overflow. The list rect is not. */
+      if (todayEl.scrollHeight > todayEl.clientHeight + 1) return true;
+      var nodes = todayEl.querySelectorAll("li.leaveby-row:not([hidden]), li.leaveby-more");
+      for (var n = 0; n < nodes.length; n++) if (rowOut(nodes[n])) return true;
+      var h2 = panel.querySelector(".sec-hdr");
+      if (h2) {
+        var hr2 = rect(h2);
+        for (var k = 0; k < chips.length; k++) if (over(hr2, rect(chips[k]))) return true;
+      }
+      if (rail) {
+        var pb2 = rect(panel);
+        if (pb2.bottom > rect(rail).top + 0.5) return true;
+      }
+      return false;
+    }
+    var hidden = 0;
+    var guard = 0;
+    setMore(0);
+    while (crosses() && hidden < total && guard < 30) {
+      guard++;
+      hidden++;
+      rows[total - hidden].hidden = true;
+      setMore(hidden);
+    }
+    todayEl.setAttribute("data-today-total", String(total));
+    todayEl.setAttribute("data-today-more", String(hidden));
+  }
+  if (!fitTodayPanel.bound && window.addEventListener) {
+    fitTodayPanel.bound = true;
+    window.addEventListener("resize", scheduleTodayFit);
+  }
   function paintLists(strip) {
     var todayEl = document.querySelector("[data-live='leaveby-today']");
     var tmrEl = document.querySelector("[data-live='leaveby-tomorrow']");
@@ -656,6 +767,7 @@
         }
         todayEl.innerHTML = html;
       }
+      scheduleTodayFit();
     }
 
     if (tmrLab) {
@@ -690,7 +802,7 @@
     for (var i = 0; i < items.length; i++) {
       var ev = items[i].ev;
       var timeLab = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "");
-      var title = shortPlace(ev.summary || ev.place || "");
+      var title = shortPlace(ev);
       var cls = "lb-rail-item" + (i === 0 ? " is-next" : "") +
         (items[i].when === "tmr" ? " is-tmr" : "");
       html += '<div class="' + cls + '">' +
@@ -731,7 +843,7 @@
       for (var j = 0; j < list.length; j++) {
         var ev2 = list[j].ev;
         var t2 = ev2.allDay ? "day" : (clockTimeFromIso(ev2.start) || "");
-        var title2 = shortPlace(ev2.summary || ev2.place || "");
+        var title2 = shortPlace(ev2);
         html += '<div class="lb-who-row' + (j === 0 ? " is-next" : "") + '">' +
           '<span class="lb-who-time">' + esc(t2) + "</span>" +
           '<span class="lb-who-title">' + esc(title2) + "</span>" +
@@ -758,7 +870,7 @@
       '<div class="lb-peek-hero">' +
       '<span class="lb-peek-kicker">Next</span>' +
       '<span class="lb-peek-time">' + esc(t0) + "</span>" +
-      '<span class="lb-peek-title">' + esc(shortPlace(first.summary || first.place || "")) + "</span>" +
+      '<span class="lb-peek-title">' + esc(shortPlace(first)) + "</span>" +
       "</div>";
     if (items.length > 1) {
       html += '<div class="lb-peek-quiet">';
@@ -767,7 +879,7 @@
         var t = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "");
         html += '<div class="lb-peek-row">' +
           '<span class="lb-peek-row-time">' + esc(t) + "</span>" +
-          '<span class="lb-peek-row-title">' + esc(shortPlace(ev.summary || ev.place || "")) + "</span>" +
+          '<span class="lb-peek-row-title">' + esc(shortPlace(ev)) + "</span>" +
           "</div>";
       }
       html += "</div>";
@@ -786,7 +898,7 @@
     }
     var ev = items[0].ev;
     var mins = minsUntil(ev);
-    var title = shortPlace(ev.summary || ev.place || "");
+    var title = shortPlace(ev);
     var timeLab = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "");
     var windowM = 180;
     var pct = mins == null ? 0 : Math.max(0, Math.min(1, 1 - (mins / windowM)));
@@ -826,7 +938,7 @@
         var t = ev.allDay ? "day" : (clockTimeFromIso(ev.start) || "");
         html += '<li class="lb-list-row' + (i === 0 && !ev.allDay ? " is-next" : "") + '">' +
           '<span class="lb-list-time">' + esc(t) + "</span>" +
-          '<span class="lb-list-title">' + esc(shortPlace(ev.summary || ev.place || "")) + "</span>" +
+          '<span class="lb-list-title">' + esc(shortPlace(ev)) + "</span>" +
           "</li>";
       }
     }
@@ -844,7 +956,7 @@
         var t2 = ev2.allDay ? "day" : (clockTimeFromIso(ev2.start) || "");
         html += '<li class="lb-list-row">' +
           '<span class="lb-list-time">' + esc(t2) + "</span>" +
-          '<span class="lb-list-title">' + esc(shortPlace(ev2.summary || ev2.place || "")) + "</span>" +
+          '<span class="lb-list-title">' + esc(shortPlace(ev2)) + "</span>" +
           "</li>";
       }
     }
@@ -865,7 +977,7 @@
     ".lb-day-stop:first-of-type{border-top:0}",
     ".lb-day-t{font-size:20px;font-weight:900;letter-spacing:-.04em;line-height:1;color:#f2eee6}",
     ".lb-day-stop.is-next .lb-day-t{color:#ffe080;text-shadow:0 0 16px rgba(255,180,30,.5)}",
-    ".lb-day-what{font-size:12px;font-weight:700;color:#e8e2d6;line-height:1.2;margin-top:2px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}",
+    ".lb-day-what{font-size:24px;font-weight:700;color:#e8e2d6;line-height:1.2;margin-top:2px;overflow:hidden;display:block}",
     ".lb-day-tags{display:flex;flex-wrap:wrap;gap:3px;margin-top:3px}",
     ".lb-day-tag{font-size:9px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:1px 5px;border-radius:6px;background:rgba(255,255,255,.1);color:#f2eee6}",
     ".lb-day-tag[data-who=Ainsley]{background:rgba(236,72,153,.28);color:#ffd1e8}",
@@ -874,9 +986,9 @@
     ".lb-day-tag[data-who=Dan]{background:rgba(255,224,128,.18);color:#ffe9a8}",
     ".lb-day-prep{font-size:10px;color:#bdb6a8;margin-top:2px}",
     ".lb-day-none{font-size:11px;color:#8d877c;padding:4px 0}",
-    ".lb-day-tmr{display:flex;flex-wrap:wrap;align-items:center;gap:5px;font-size:11px;color:#d8d2c6}",
-    ".lb-day-tmr b{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#ffe080;margin-right:2px}",
-    ".lb-day-tchip{background:rgba(255,255,255,.06);border-radius:8px;padding:2px 7px;white-space:nowrap}",
+    ".lb-day-tmr{display:flex;flex-direction:column;flex-wrap:nowrap;align-items:stretch;gap:8px;font-size:24px;color:#d8d2c6}",
+    ".lb-day-tmr b{font-size:24px;letter-spacing:.12em;text-transform:uppercase;color:#ffe080;margin-right:2px}",
+    ".lb-day-tchip{display:block;background:rgba(255,255,255,.06);border-radius:8px;padding:2px 7px;font-size:24px;line-height:1.2}",
     ".lb-day-tchip strong{color:#f2eee6;margin-right:4px}"
   ].join("\n");
 
@@ -904,11 +1016,21 @@
   }
 
   function nowCtHour() {
-    return ctHour(new Date().toISOString());
+    var d = new Date();
+    try {
+      if (global.HouseScene && typeof HouseScene.now === "function") d = HouseScene.now();
+      else if (global.LHClock && typeof LHClock.now === "function") d = LHClock.now();
+      else if (global.HouseClock && typeof HouseClock.iso === "function") {
+        var q = new URLSearchParams(global.location.search || "");
+        if (q.get("now")) d = new Date(q.get("now"));
+      }
+    } catch (e) { /* live hour */ }
+    if (!d || isNaN(+d)) d = new Date();
+    return ctHour(d.toISOString());
   }
 
   function dayTitle(ev) {
-    var s = shortPlace(ev.summary || ev.place || "");
+    var s = shortPlace(ev);
     /* drop leading kid names — the tags carry who */
     var out = s.replace(/^(?:(?:Hayes|Harris|Ainsley|Boys|Dan)\s*(?:\+\s*)?)+\s*[—-]\s*/i, "") || s;
     /* time is already big on the left · drop echoed "leave 5:40 · 6:00" / "· 8:25" tails and Free/HOLD chrome */
@@ -1029,6 +1151,107 @@
     el.setAttribute("data-layout", mode);
     syncChipUI(mode);
     paintLists(strip); /* keep legacy nodes in sync if present */
+    fitStripRows();
+    setTimeout(fitStripRows, 60);
+  }
+
+  /* Rows that would paint under Music are replaced by a visible count. */
+  function fitStripRows() {
+    var host = document.querySelector(".leaveby.leaveby--hot");
+    var canvas = document.querySelector("[data-live='leaveby-layouts']");
+    if (!host || !canvas) return;
+    host.style.setProperty("pointer-events", "auto", "important");
+    host.style.setProperty("z-index", "40", "important");
+    host.style.setProperty("position", "fixed", "important");
+    var label = host.querySelector(".leaveby-mode-label");
+    if (label) label.style.setProperty("font-size", "24px", "important");
+    [].forEach.call(host.querySelectorAll(".leaveby-chip"), function (chip) {
+      chip.style.setProperty("font-size", "24px", "important");
+      chip.style.setProperty("min-width", "64px", "important");
+      chip.style.setProperty("min-height", "64px", "important");
+      chip.style.setProperty("height", "64px", "important");
+    });
+    var old = canvas.querySelector(".lb-more");
+    if (old) old.remove();
+    var rows = [].slice.call(canvas.querySelectorAll(".lb-day-stop, .lb-list-row, .lb-day-tchip, .lb-day-part, .lb-day-tmr"));
+    rows.forEach(function (row) { row.style.removeProperty("display"); });
+    var limit = host.getBoundingClientRect().bottom - 4;
+    function past(el) {
+      var r = el.getBoundingClientRect();
+      return r.height > 1 && r.bottom > limit + 0.5;
+    }
+    var hidden = 0;
+    var guard = 0;
+    while (guard < 60) {
+      guard += 1;
+      var bad = null;
+      for (var i = 0; i < rows.length; i++) {
+        if (rows[i].style.display === "none") continue;
+        if (past(rows[i])) bad = rows[i];
+      }
+      if (!bad) break;
+      bad.style.setProperty("display", "none", "important");
+      hidden += 1;
+    }
+    var anyWhat = false;
+    for (var w = 0; w < rows.length; w++) {
+      if (rows[w].style.display === "none") continue;
+      if (rows[w].querySelector && rows[w].querySelector(".lb-day-what")) anyWhat = true;
+    }
+    if (!anyWhat) {
+      var src = canvas.querySelector(".lb-day-what");
+      var kept = canvas.querySelector(".lb-kept");
+      if (!kept) {
+        kept = document.createElement("div");
+        kept.className = "lb-day-what lb-kept";
+        canvas.appendChild(kept);
+      }
+      kept.textContent = src ? (src.textContent || "").trim() : "Today";
+      kept.style.setProperty("display", "block", "important");
+      kept.style.setProperty("position", "static", "important");
+      kept.style.setProperty("height", "24px", "important");
+      kept.style.setProperty("line-height", "24px", "important");
+      kept.style.setProperty("font-size", "24px", "important");
+      kept.style.setProperty("white-space", "normal", "important");
+      kept.style.setProperty("overflow", "hidden", "important");
+      kept.style.setProperty("background", "#101820", "important");
+      kept.style.setProperty("color", "#f4efe6", "important");
+      kept.style.setProperty("z-index", "1", "important");
+    }
+    if (!hidden) return;
+    var cueParent = canvas.parentElement || host;
+    var cue = cueParent.querySelector(".lb-more");
+    if (!cue) {
+      cue = document.createElement("div");
+      cue.className = "lb-more";
+      cueParent.appendChild(cue);
+    }
+    cue.textContent = "+" + hidden + " more";
+    cue.style.setProperty("position", "absolute", "important");
+    cue.style.setProperty("right", "8px", "important");
+    cue.style.setProperty("left", "auto", "important");
+    cue.style.setProperty("width", "auto", "important");
+    cue.style.setProperty("bottom", "4px", "important");
+    cue.style.setProperty("top", "auto", "important");
+    cue.style.setProperty("height", "24px", "important");
+    cue.style.setProperty("line-height", "24px", "important");
+    cue.style.setProperty("display", "block", "important");
+    cue.style.setProperty("z-index", "8", "important");
+    cue.style.setProperty("pointer-events", "auto", "important");
+    cue.style.setProperty("background", "#101820", "important");
+    cue.style.setProperty("text-align", "right", "important");
+    guard = 0;
+    while (past(cue) && guard < 30) {
+      guard += 1;
+      var last = null;
+      for (var j = rows.length - 1; j >= 0; j--) {
+        if (rows[j].style.display !== "none") { last = rows[j]; break; }
+      }
+      if (!last) break;
+      last.style.setProperty("display", "none", "important");
+      hidden += 1;
+      cue.textContent = "+" + hidden + " more";
+    }
   }
 
   function applyStrip(strip, clock) {
@@ -1052,7 +1275,10 @@
     dowNodes.forEach(function (n) { n.textContent = clock.dow; });
     var timeNodes = document.querySelectorAll("[data-live='time'], [data-live-clock], [data-live='clock-time']");
     timeNodes.forEach(function (n) {
-      n.textContent = clock.time || (global.HouseClock && HouseClock.timeLabel ? HouseClock.timeLabel() : "");
+      var time = clock.time || (global.HouseClock && HouseClock.timeLabel ? HouseClock.timeLabel() : "");
+      var dow = String((clock && clock.dow) || "").replace(/\./g, "");
+      if (dow) dow = dow.charAt(0).toUpperCase() + dow.slice(1, 3).toLowerCase();
+      n.textContent = dow && time ? dow + " \u00b7 " + time : time;
     });
 
     /* AUDIT1 · hero names its day when the next item is not today ("Next up · Wed" / "Wed") */
@@ -1156,7 +1382,15 @@
     });
   }
 
+  function testCal() {
+    try {
+      if (!/[?&]wardos-test=1(?:&|$)/.test(String(global.location && global.location.search || ""))) return null;
+      return global.__wardosFixture || null;
+    } catch (e) { return null; }
+  }
   function loadCal(cb) {
+    var fx = testCal();
+    if (fx) { cb(null, fx.cal || fx); return; }
     var urls = [
       "data/cal-live.json?v=" + Date.now(),
       "data/cal-live.json"

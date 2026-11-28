@@ -28,8 +28,10 @@
     if (hero) {
       var t = hero.querySelector(".hero-title"), s = hero.querySelector(".hero-sub");
       if (r[0]) { t.textContent = dayLab(r[0].iso) + " \u00b7 " + r[0].l; s.textContent = ""; }
-      else { t.textContent = "Nothing planned yet."; /* WGQUIET1 */ s.textContent = ""; }
+      else { t.textContent = "Nothing planned yet."; /* WGQUIET1 */ s.textContent = ""; hero.style.cssText = "display:flex;align-items:center;justify-content:center;min-height:480px;text-align:center"; }
     }
+    var upcoming = document.querySelector(".sec-title");
+    if (upcoming && /upcoming/i.test(upcoming.textContent || "")) upcoming.hidden = !r.length;
     if (list) {
       list.innerHTML = r.map(function (x, i) {
         return '<article class="trip' + (i === 0 ? " is-next" : "") + '"><div class="trip-when">' + esc(dayLab(x.iso)) +

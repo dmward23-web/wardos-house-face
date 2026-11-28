@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8" />
 <script src="house-hub.js?v=HUBPAIR1"></script>
-<script src="private-feed.js?v=HUBPAIR1D"></script>
+<script src="private-feed.js?v=R53AR1"></script>
 <script src="house-nomoney.js?v=KIDCRIT1"></script>
 <script src="house-face-law.js?v=FACESTRIP1"></script>
 <script src="house-pair.js?v=HUBPAIR1"></script>
 <script src="house-money-bind.js?v=DAYPKG1"></script>
 <script src="house-sound.js?v=MERGE1C"></script>
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
-<meta name="viewport" content="width=1080" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -316,7 +316,7 @@
 <script>(function(){var h=document.documentElement;h.classList.add("ori-on");try{var sw=Math.min(screen.width||0,screen.height||0);if(sw&&sw<=600){h.classList.add("ori-phone");var v=document.querySelector('meta[name="viewport"]');if(v)v.setAttribute("content","width=device-width, initial-scale=1, viewport-fit=cover");}}catch(e){}})();</script>
 <link rel="stylesheet" href="house-ori.css?v=ORIHOME18" />
 <link rel="stylesheet" href="night/night-host.css?v=SUNHOME1" />
-<link rel="stylesheet" href="month-theme/month-overlay.css?v=SUNHOME2" />
+<link rel="stylesheet" href="month-theme/month-overlay.css?v=PASS2X1" />
 <style id="p1fix-ideas">
 /* P1FIX B87 · Our Ideas: cards size to their content (no full-height empty slabs); the 3 "Tap to add" rows stay compact;
    the 3 kid chips sit in one row. */
@@ -330,8 +330,14 @@ html body .kid-chips-sec .vote-card{flex:1 1 0!important;min-width:0;min-height:
 html body .kid-chips-sec .vote-card .a{font-size:14px}
 </style>
 <link rel="stylesheet" href="wg-glass.css?v=HOTFIX1" />
+<link rel="stylesheet" href="wardos-stage.css?v=ACERFIX1" data-wardos-stage-css="1" />
+<script src="house-scene.js?v=ACERFIX1"></script>
+<script src="house-event-display.js?v=ACERFIX1"></script>
+<script src="wardos-stage.js?v=ACERFIX1"></script>
+<link id="prism-face-css" rel="stylesheet" href="prism-face.css">
 </head>
 <body>
+<a class="wardos-home" href="sheet-index.html" data-kw-home aria-label="Home"><img src="assets/icons/home-key-light.svg" alt="" width="64" height="64"></a>
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
   <defs>
     <!-- Shared paints · HEAT v3 cyan+gold -->
@@ -587,7 +593,7 @@ html body .kid-chips-sec .vote-card .a{font-size:14px}
  </div>
  </div>
  <div class="hdr-right">
- <div class="hot-pill"><span class="idea-jar-live"><i></i>LIVE jar</span> · empty</div>
+ <div class="hot-pill">Ideas</div>
  </div>
  </header>
 
@@ -597,9 +603,9 @@ html body .kid-chips-sec .vote-card .a{font-size:14px}
  <div class="cheer-main">
  <div class="cheer-label">Our Ideas</div>
  <div class="cheer-title">Family ideas · <span class="hl">brainstorm</span></div>
- <div class="cheer-sub"><strong>Empty LIVE jar</strong> · tap to add</div>
+ <div class="cheer-sub">Tap to add an idea</div>
  </div>
- <div class="cheer-badges"><div class="cheer-badge cmd-pill cmd-pill--live">LIVE · EMPTY</div></div>
+ <div class="cheer-badges"><div class="cheer-badge cmd-pill">Ideas</div></div>
  </div>
  </section>
 
@@ -663,7 +669,7 @@ html body .kid-chips-sec .vote-card .a{font-size:14px}
 
  <footer class="ftr">
  <div class="ftr-left">
- <span class="ftr-chip">OUR IDEAS · LIVE EMPTY JAR</span>
+ <span class="ftr-chip">Ideas</span>
  </div>
  </footer>
 </div>
@@ -673,14 +679,14 @@ html body .kid-chips-sec .vote-card .a{font-size:14px}
 <script src="house-zoom.js"></script>
 <script>(function(){document.querySelectorAll(".empty-slot,.opt").forEach(function(el){el.addEventListener("pointerdown",function(){try{if(window.HouseSfx&&HouseSfx.tap)HouseSfx.tap()}catch(e){}},{passive:true})});})();</script>
 <script src="house-clock.js?v=LIVEWX2"></script>
-<script src="house-fresh.js?v=JARTAP1D2"></script>
+<script src="house-fresh.js?v=R53AR1"></script>
 <script src="house-hdr-home.js?v=MUTEHIT1"></script>
 <script src="house-links.js?v=LINKWEB1"></script>
 <script src="ori/plates/painted/manifest.js?v=ORIHOME18"></script>
 <script src="ori/ori-scene.js?v=ORIHOME18"></script>
 <script src="house-ori-world.js?v=MERGE1C"></script>
 <script src="night/night-host.js?v=BGONCE1" defer></script>
-<script src="month-theme/season-math.js?v=SUNHOME1" defer></script><script src="month-theme/month-overlay.js?v=SUNHOME2" defer></script>
+<script src="month-theme/season-math.js?v=SUNHOME1" defer></script><script src="month-theme/month-overlay.js?v=PASS2X1" defer></script>
 <script>/* ADDIDEA1 · "Tap to add an idea" idea slots open a text box; ideas stay on this device (localStorage), never in data/*.json */
 (function(){var K="weekend:ideas";function load(){try{return JSON.parse(localStorage.getItem(K)||"{}")}catch(e){return{}}}
 function save(o){try{localStorage.setItem(K,JSON.stringify(o))}catch(e){}}
@@ -694,5 +700,6 @@ s.txt.style.display="none";s.txt.parentNode.insertBefore(i,s.txt.nextSibling);i.
 function fin(keep){if(done)return;done=true;var o=load(),v=i.value.trim();if(keep){if(v)o[s.key]=v;else delete o[s.key];save(o)}i.remove();s.txt.style.display="";show(s,load()[s.key])}
 i.addEventListener("keydown",function(e){e.stopPropagation();if(e.key==="Enter")fin(true);if(e.key==="Escape")fin(false)});i.addEventListener("blur",function(){fin(true)});i.addEventListener("click",function(e){e.stopPropagation()})}
 slots.forEach(function(s){s.el.style.cursor="pointer";s.el.addEventListener("click",function(e){e.preventDefault();e.stopImmediatePropagation();edit(s)},true);s.el.addEventListener("keydown",function(e){if(e.target!==s.el)return;if(e.key==="Enter"||e.key===" "){e.preventDefault();edit(s)}})});})();</script>
+<script id="prism-face-js" src="prism-face.js"></script>
 </body>
 </html>

@@ -8,6 +8,17 @@
  * Header stays tap-home (house-hdr-home.js). Re-scans after live re-renders. */
 (function () {
   "use strict";
+  if (typeof document !== "undefined" && document.write && document.readyState === "loading") {
+    var wallFile = (location.pathname.split("/").pop() || "").toLowerCase();
+    var kidBoard = wallFile.indexOf("kid-") === 0 || (document.body && document.body.hasAttribute("data-kid-world"));
+    if (!kidBoard && !document.querySelector('script[src*="wardos-stage.js"]') && !document.querySelector('script[src*="mercury-run.js"]')) {
+      document.write('<link rel="stylesheet" href="wardos-stage.css?v=ACERFIX1" data-wardos-stage-css="1">');
+      document.write('<script src="wardos-stage.js?v=ACERFIX1"><\/script>');
+    }
+    if (!document.querySelector('script[src*="house-home.js"]')) {
+      document.write('<script src="house-home.js?v=R58HOME"><\/script>');
+    }
+  }
   var PAGE = (location.pathname.split("/").pop() || "sheet-index.html").toLowerCase();
   var KIDS = { ainsley: "kid-ainsley.html", hayes: "kid-hayes.html", harris: "kid-harris.html" };
   var ABBR = { ain: "ainsley", hay: "hayes", har: "harris", ains: "ainsley" };
@@ -68,14 +79,8 @@
   }
 
   var R = [
-    /* every board · build/status footer stamps → Status */
-    ["*", "span.ftr-chip:not(a), div.ftr-chip:not(a)", STATUS],
-
     /* Google Home hub (+ retired Sensi redirect) */
-    ["sheet-google-home.html", ".cam-path, .note", CAMS],
-
-    /* Nest cam viewer · STILL / NEED KEY state pill → Status (open gaps) */
-    ["nest-webrtc.html", ".hud .pill", STATUS],
+    ["sheet-google-home.html", ".cam-path, .note", HUBHOME],
 
     /* Lights · garage / door pads that aren't lights → Google Home pads */
     ["sheet-lights.html", "article.light-pad.is-need-connect", HUBHOME],
@@ -105,7 +110,7 @@
 
     /* Chores · streak badge → that kid's board (DAYPKG1 v2e: the Paid sheet is URL only, so no jar path) */
     ["sheet-chores.html", ".streak", kid(null)],
-    ["sheet-chores.html", ".cheer-badge", byText([[/3 KIDS/i, INDEX], [/LIVE|TAPS/i, STATUS]])],
+    ["sheet-chores.html", ".cheer-badge", byText([[/3 KIDS/i, INDEX]])],
 
     /* Groceries · each kid's treat slot → that kid's board */
     ["sheet-groceries.html", ".treat", kid(null)],
@@ -115,7 +120,6 @@
 
     /* Our ideas (weekend) · kid idea cards → kid boards */
     ["sheet-weekend.html", ".vote-card", kid(null)],
-    ["sheet-weekend.html", ".cheer-badge", STATUS],
 
     /* Family trips (win) */
     ["sheet-win.html", "section.hero, article.trip.is-next", PACK],
@@ -134,7 +138,7 @@
 
     /* Us */
     ["sheet-us.html", ".log-card", byText([[/calendar/i, MONTH]], US)],
-    ["sheet-us.html", ".safe-note", DESK],
+    ["sheet-us.html", ".safe-note", US],
 
     /* Countdowns */
     ["sheet-countdowns.html", "section.cheer, .flame-row", kid(MONTH)],
@@ -149,7 +153,7 @@
 
     /* Load day */
     ["sheet-load-day.html", "section.loadband", MONTH],
-    ["sheet-load-day.html", "article.beat", byText([[/House\+Desk/i, DESK]], kid(TODAY))],
+    ["sheet-load-day.html", "article.beat", byText([[/House\+Desk/i, TODAY]], kid(TODAY))],
     ["sheet-load-day.html", ".kchip", kid(null)],
     ["sheet-load-day.html", "section.sec[aria-label*='glance' i], .bag-card, .glance-row", TODAY],
 
@@ -197,7 +201,9 @@
       t = MONTH;
     }
     try { if (window.HouseSfx && window.HouseSfx.tap) window.HouseSfx.tap(); } catch (e) {}
-    window.location.assign(t);
+    var dest = t;
+    try { if (window.HouseAudit && HouseAudit.href) dest = HouseAudit.href(t); } catch (eH) { dest = t; }
+    window.location.assign(dest);
   }
   document.addEventListener("click", function (ev) {
     if (ev.defaultPrevented || ev.button > 0) return;

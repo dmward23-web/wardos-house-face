@@ -51,9 +51,17 @@
     if (revealed) return; revealed = true;
     requestAnimationFrame(function () { body.classList.remove("spw-boot"); body.classList.add("spw-entered"); setTimeout(function () { body.classList.add("spw-settled"); }, 1900); });
   }
-  W = mountWorld();
-  window.spwWorld = W; /* handy for QA (stats(), fps) */
-  if (!W) revealUI();
+  function bootWorld() {
+    W = mountWorld();
+    window.spwWorld = W; /* handy for QA (stats(), fps) */
+    if (!W) revealUI();
+  }
+  function deferWorld() {
+    function go() { requestAnimationFrame(function () { setTimeout(bootWorld, 0); }); }
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go, { once: true });
+    else go();
+  }
+  deferWorld();
 
   /* back: the world irises shut toward the button, then home */
   document.querySelectorAll("[data-spw-back]").forEach(function (a) {
@@ -66,7 +74,12 @@
       setTimeout(function () { location.href = href; }, 1400);
     });
   });
-  window.addEventListener("pageshow", function (e) { if (e.persisted) { body.classList.remove("spw-leaving"); if (W) { W.trans = null; W.kick(true); } } });
+  window.addEventListener("pageshow", function (e) {
+    if (!e.persisted) return;
+    body.classList.remove("spw-leaving");
+    if (W) { W.trans = null; W.kick(true); return; }
+    bootWorld();
+  });
 
   /* ---------- static icons ---------- */
   document.querySelector('[data-a="shuffle"]').insertAdjacentHTML("afterbegin", I.shuffle);

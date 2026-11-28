@@ -47,7 +47,9 @@ const OUTBOUND_AUTH_RE = new RegExp([
    the loopback stand-in for https://dmward23-web.github.io/wardos-house-face/). Non-house targets that must stay: none. */
 const OFFSITE_ALLOW = [];
 
-for (const [w, h] of [[440, 956], [1280, 800]]) {
+/* One viewport per file. Two viewports in this file miss the suite's 240s file cap. */
+const SIZES = process.env.CRAWL_ONLY === "1280" ? [[1280, 800]] : process.env.CRAWL_ONLY === "440" ? [[440, 956]] : [];
+for (const [w, h] of SIZES) {
   test("DAYPKG1 v2j browser crawl @" + w + ": all kid-reachable pages, 0 '" + D + "' in DOM, transient writes and storage", { ...SKIP, timeout: 900000 }, () => {
     const r = spawnSync("python3", [path.join(ROOT, "scripts/qa/daypkg1v2j_crawl.py"), String(w), String(h)], { encoding: "utf8", timeout: 880000, env: { ...process.env, ADULT_DENY_RE: ADULT_DENY_RE.source, OUTBOUND_AUTH_RE: OUTBOUND_AUTH_RE.source, OFFSITE_ALLOW: JSON.stringify(OFFSITE_ALLOW) } });
     if (process.env.V2J_DRIVER_LOG) { try { fs.appendFileSync(process.env.V2J_DRIVER_LOG, JSON.stringify({ w, h, pid: r.pid, status: r.status, signal: r.signal }) + "\n"); } catch (e) {} }

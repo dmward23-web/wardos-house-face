@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8" />
 <script src="house-hub.js?v=HUBPAIR1"></script>
-<script src="private-feed.js?v=HUBPAIR1D"></script>
+<script src="private-feed.js?v=R53AR1"></script>
 <script src="school-names.js?v=SUNHOME1"></script>
 <script src="house-face-law.js?v=FACESTRIP1"></script>
 <script src="house-pair.js?v=HUBPAIR1"></script>
 <script src="house-sound.js?v=MERGE1C"></script>
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
-<meta name="viewport" content="width=1080" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -396,7 +396,10 @@
  .hayes .kid-when { color: #144838; }
  .ainsley .kid-when { color: #6a6e76; font-size: 22px; }
  .kid-what {
- font-size: 18px; font-weight: 750; letter-spacing: -0.025em; color: #121418;
+ font-size: 24px; font-weight: 750; letter-spacing: -0.025em; color: #121418;
+ }
+ .kid-what-line {
+ display: block; font-size: 24px; line-height: 1.2; font-weight: 750;
  }
  .kid-hint { font-size: 13px; font-weight: 600; color: #5a5e66; margin-top: 2px; }
 
@@ -547,7 +550,7 @@
 .kid-card .kid-what { color: #f3ead2; overflow-wrap: anywhere; }
 .kid-card .kid-hint { color: #9a917e; }
 .kid-card .kid-when[hidden], .kid-card .kid-what[hidden] { display: none !important; }
-/* P1FIX B74 · the card grows with its rows, so the "Musts · Jar · Days on board" line is never cut under the edge */
+/* P1FIX B74 · the card grows with its rows, so the "Musts · Jar · Days" line is never cut under the edge */
 .kid-card { flex: 1 0 auto; padding-bottom: 20px; }
 </style>
 <style id="heat1-hide-brand">.brand img,.brand{display:none!important}.eyebrow{display:none!important}</style>
@@ -556,7 +559,7 @@
 <script>(function(){var h=document.documentElement;h.classList.add("ori-on");try{var sw=Math.min(screen.width||0,screen.height||0);if(sw&&sw<=600){h.classList.add("ori-phone");var v=document.querySelector('meta[name="viewport"]');if(v)v.setAttribute("content","width=device-width, initial-scale=1, viewport-fit=cover");}}catch(e){}})();</script>
 <link rel="stylesheet" href="house-ori.css?v=ORIHOME18" />
 <link rel="stylesheet" href="night/night-host.css?v=SUNHOME1" />
-<link rel="stylesheet" href="month-theme/month-overlay.css?v=SUNHOME2" />
+<link rel="stylesheet" href="month-theme/month-overlay.css?v=PASS2X1" />
 <script src="house-face-law.js?v=FACESTRIP1"></script><!-- LIVELAW1 · Dan face laws (colour/dress-up days, ended rows, em dashes) before any board renders -->
 <style id="p1fix-today-wx">
 /* P1FIX Today P2 · weather card text reads on the dark glass (temperature was rgb(14,16,20) on dark) */
@@ -573,8 +576,14 @@ html body .qtile .qtile-icon.g2-ti .g2{width:32px!important;height:32px!importan
 </style>
 <link rel="stylesheet" href="house-wall-frame.css?v=P1FIX" />
 <link rel="stylesheet" href="wg-glass.css?v=HOTFIX1" />
+<link rel="stylesheet" href="wardos-stage.css?v=ACERFIX1" data-wardos-stage-css="1" />
+<script src="house-scene.js?v=ACERFIX1"></script>
+<script src="house-event-display.js?v=ACERFIX1"></script>
+<script src="wardos-stage.js?v=ACERFIX1"></script>
+<link id="prism-face-css" rel="stylesheet" href="prism-face.css">
 </head>
 <body>
+<a class="wardos-home" href="sheet-index.html" data-kw-home aria-label="Home"><img src="assets/icons/home-key-light.svg" alt="" width="64" height="64"></a>
 <svg xmlns="http://www.w3.org/2000/svg" class="g2-sprite" aria-hidden="true" focusable="false">
   <defs>
     <!-- Shared paints · HEAT v3 cyan+gold -->
@@ -850,7 +859,8 @@ html body .qtile .qtile-icon.g2-ti .g2{width:32px!important;height:32px!importan
  </section>
 
  
-<a class="leaveby" aria-label="Leave-by countdown">
+<style>html body a.leaveby { display: none !important; }</style>
+<a class="leaveby" aria-label="Leave-by countdown" hidden>
  <div class="leaveby-accent"></div>
  <div class="leaveby-body">
  <div class="leaveby-label" data-live="leaveby-label">NEXT UP · leave by</div>
@@ -898,7 +908,7 @@ html body .qtile .qtile-icon.g2-ti .g2{width:32px!important;height:32px!importan
  <div class="kid-when" data-today-kid-when="harris" hidden></div>
  <div>
  <div class="kid-what" data-today-kid-what="harris" hidden></div>
- <div class="kid-hint">Musts · Jar · Days on board</div>
+ <div class="kid-hint">Musts · Jar · Days</div>
  </div>
  </a>
  <a class="kid-card hayes" href="kid-hayes.html">
@@ -909,7 +919,7 @@ html body .qtile .qtile-icon.g2-ti .g2{width:32px!important;height:32px!importan
  <div class="kid-when" data-today-kid-when="hayes" hidden></div>
  <div>
  <div class="kid-what" data-today-kid-what="hayes" hidden></div>
- <div class="kid-hint">Musts · Jar · Days on board</div>
+ <div class="kid-hint">Musts · Jar · Days</div>
  </div>
  </a>
  <a class="kid-card ainsley" href="kid-ainsley.html">
@@ -920,7 +930,7 @@ html body .qtile .qtile-icon.g2-ti .g2{width:32px!important;height:32px!importan
  <div class="kid-when" data-today-kid-when="ainsley" hidden></div>
  <div>
  <div class="kid-what" data-today-kid-what="ainsley" hidden></div>
- <div class="kid-hint">Musts · Jar · Days on board</div>
+ <div class="kid-hint">Musts · Jar · Days</div>
  </div>
  </a>
  </section>
@@ -978,7 +988,7 @@ html body .qtile .qtile-icon.g2-ti .g2{width:32px!important;height:32px!importan
 <script src="house-board-strip.js?v=PAIRUI1"></script>
 <script src="house-today-bind.js?v=P1FIX"></script>
 <script src="house-day-view.js?v=P1FIX"></script>
-<script src="livewx-core.js?v=LIVEWX2B"></script><script src="house-weather.js?v=LIVEWX2"></script>
+<script src="livewx-core.js?v=R53AR1"></script><script src="house-weather.js?v=R53AR1"></script>
 <script src="house-sensi.js?v=SUNHOME1"></script>
 <script src="house-zoom.js"></script>
 <script>
@@ -1047,14 +1057,23 @@ try { if (window.HouseWeather) HouseWeather.mount("#house-wx"); } catch (e) {}
   }
 })();
 </script>
-<script src="house-fresh.js?v=JARTAP1D2"></script>
+<script src="house-fresh.js?v=R53AR1"></script>
 <script src="house-hdr-home.js?v=MUTEHIT1"></script>
 <script src="house-links.js?v=LINKWEB1"></script>
 <script src="ori/plates/painted/manifest.js?v=ORIHOME18"></script>
 <script src="ori/ori-scene.js?v=ORIHOME18"></script>
 <script src="house-ori-world.js?v=MERGE1C"></script>
 <script src="night/night-host.js?v=BGONCE1" defer></script>
-<script src="month-theme/season-math.js?v=SUNHOME1" defer></script><script src="month-theme/month-overlay.js?v=SUNHOME2" defer></script>
+<script src="month-theme/season-math.js?v=SUNHOME1" defer></script><script src="month-theme/month-overlay.js?v=PASS2X1" defer></script>
 <link rel="stylesheet" href="wall-board-sheets.css?v=WALLSHEET1" />
+<script id="prism-face-js" src="prism-face.js"></script>
+<style id="pass1-r2-today-wall">
+@media (min-width: 1400px) {
+  html:not(#hf-wall-off) body .panel .qtile .qtile-tap { right: 28px !important; max-width: 72px !important; }
+  html:not(#hf-wall-off) body .panel .sec[aria-label="Quick taps"] .qtile {
+    padding: 0 16px !important; box-sizing: border-box !important;
+  }
+}
+</style>
 </body>
 </html>

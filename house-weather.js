@@ -153,6 +153,9 @@
   /* P1FIX B73 (wall re-judge) · dark = the sun is below the horizon at the house (solar elevation under -0.833 deg,
      NOAA low-precision formula), so 6:41 AM in October (before sunrise) gets a moon, not a sun. */
   function sunDown(now) {
+    if (global.HouseScene && typeof HouseScene.sunDown === "function") {
+      return HouseScene.sunDown(now || (HouseScene.now ? HouseScene.now() : new Date()));
+    }
     var rad = Math.PI / 180, ms = now.getTime();
     var n = ms / 86400000 + 2440587.5 - 2451545.0;            /* days since J2000 */
     var L = (280.460 + 0.9856474 * n) % 360, g = ((357.528 + 0.9856003 * n) % 360) * rad;
@@ -168,12 +171,47 @@
      Night = sunDown() (solar elevation under -0.833 deg at the house); sun and sun-cloud icons read as moon and cloud. */
   function nightIcon(d) {
     if (!d || !d.icon) return d;
-    var dn = sunDown(new Date()); if (dn === null ? d.isDay !== 0 : !dn) return d;
+    var now = global.HouseScene && HouseScene.now ? HouseScene.now() : new Date();
+    var night = global.WardSunPhase ? global.WardSunPhase(now) === "night" : (function () { var dn = sunDown(now); return dn === null ? d.isDay === 0 : dn; })();
+    if (!night) return d;
     var map = { "\u2600": "\ud83c\udf19", "\u2600\ufe0f": "\ud83c\udf19", "\u26c5": "\u2601", "\ud83c\udf24": "\u2601", "\ud83c\udf24\ufe0f": "\u2601", "\ud83c\udf25": "\u2601" };
     if (!map[d.icon]) return d;
     var o = {}; for (var k in d) o[k] = d[k];
     o.icon = map[d.icon];
     return o;
+  }
+  var WX_STEPS = [15000, 30000, 60000, 120000, 300000];
+  var wxStep = 0, wxTimer = 0, wxMounted = [];
+  function wxWait(step) {
+    var base = WX_STEPS[Math.min(step, WX_STEPS.length - 1)];
+    var jitter = Math.round((Math.random() - 0.5) * 0.2 * base);
+    return Math.max(1000, base + jitter);
+  }
+  function wxRetryable(err) {
+    var code = err && err.status ? err.status : 0;
+    if (code === 401) return false;
+    if (code && code < 500) return false;
+    return code >= 500 || code === 0;
+  }
+  function redrawWx(data) {
+    for (var i = 0; i < wxMounted.length; i++) {
+      var el = wxMounted[i];
+      try { el.style.removeProperty("display"); paint(el, data); } catch (e) {}
+    }
+  }
+  function scheduleWx() {
+    if (wxTimer) return;
+    var wait = wxWait(wxStep);
+    wxStep += 1;
+    wxTimer = setTimeout(function () {
+      wxTimer = 0;
+      load(function (err, data) {
+        if (err || !data) return;
+        wxStep = 0;
+        redrawWx(data);
+      });
+    }, wait);
+    if (wxTimer && wxTimer.unref) wxTimer.unref();
   }
   function load(cb0) {
     var cb = function (err, d) { cb0(err, nightIcon(d)); };
@@ -181,11 +219,14 @@
     if (cached) { cb(null, cached); return; }
     Promise.all([within(9000, fromWx()), fromObs()]).then(function (res) {
       var d = mergeObs(res[0], res[1], res[0].code);
+      wxStep = 0;
+      if (wxTimer) { clearTimeout(wxTimer); wxTimer = 0; }
       if (d.stale) { cb(null, d); return; }   /* the hub's last-known reading: shown with its age, never cached as fresh */
       writeCache(d); cb(null, d);
     }).catch(function (err) {
       /* LIVEWX1 · feed down: the last known reading (any age, marked stale), never a default; nothing only when no reading ever */
       var last = null; try { var o = JSON.parse(localStorage.getItem(CACHE_KEY) || "null"); if (o && o.data) { last = {}; for (var k in o.data) last[k] = o.data[k]; last.stale = true; last.at = o.at; } } catch (e) {}
+      if (wxRetryable(err)) scheduleWx();
       if (last) cb(null, last); else cb(err || new Error("wx fail"), null);
     });
   }
@@ -201,6 +242,12 @@
     var ico = data.icon || "🌤";
     el.classList.add("wx-card", "wx-live", "is-live");
     el.hidden = false; el.style.removeProperty("display");
+    if (el.id === "house-wx") {
+      el.innerHTML =
+        '<span class="status-kicker">Outdoor</span>'
+        + '<span class="status-temp">' + data.temp + "°</span>";
+      return;
+    }
     el.innerHTML =
       '<div class="wx-hdr-ico" aria-hidden="true">' + ico + "</div>"
       + '<div class="wx-hdr-text wx-text">'
@@ -229,13 +276,15 @@
   function mount(selector) {
     var el = typeof selector === "string" ? document.querySelector(selector) : selector;
     if (!el) return;
+    if (wxMounted.indexOf(el) < 0) wxMounted.push(el);
     el.setAttribute("aria-label", "Weather");
     el.classList.add("wx-card", "wx-live");
     /* LAW8C1 · no empty pill while loading: the chip stays hidden until a real reading lands; a failed load stays hidden and is
        flagged on the element (data-wx-state="down") for the health checks, never drawn as a dash */
-    if (!el.classList.contains("is-live")) { el.style.setProperty("display", "none", "important"); el.setAttribute("data-wx-state", "loading"); }
-    el.innerHTML =
-      '<div class="wx-hdr-ico" aria-hidden="true">🌤</div>'
+    if (el.id !== "house-wx" && !el.classList.contains("is-live")) { el.style.setProperty("display", "none", "important"); el.setAttribute("data-wx-state", "loading"); }
+    el.innerHTML = el.id === "house-wx"
+      ? '<span class="status-kicker">Outdoor</span><span class="status-temp">—°</span><span class="status-note">offline</span>'
+      : '<div class="wx-hdr-ico" aria-hidden="true">🌤</div>'
       + '<div class="wx-hdr-text wx-text">'
       + '<div class="wx-kicker">Weather</div>'
       + '<div class="wx-line"><span class="wx-temp"></span><span class="wx-cond"></span></div>'
@@ -245,15 +294,17 @@
       if (!(err || !data)) { el.style.removeProperty("display"); el.setAttribute("data-wx-state", "live"); }
       if (err || !data) {
         el.classList.remove("is-live");
-        el.setAttribute("data-wx-state", "down"); el.style.setProperty("display", "none", "important"); /* P1FIX · offline: no icon-only row */
-        el.innerHTML =
-          '<div class="wx-hdr-ico" aria-hidden="true">🌤</div>'
+        el.setAttribute("data-wx-state", "down");
+        el.innerHTML = el.id === "house-wx"
+          ? '<span class="status-kicker">Outdoor</span><span class="status-temp">—°</span><span class="status-note">offline</span>'
+          : '<div class="wx-hdr-ico" aria-hidden="true">🌤</div>'
           + '<div class="wx-hdr-text wx-text">'
           + '<div class="wx-kicker">Weather</div>'
-          + '<div class="wx-line"><span class="wx-temp"></span><span class="wx-cond">Weather later</span></div>'
-          + '<div class="wx-sub">retry</div>'
+          + '<div class="wx-line"><span class="wx-temp"></span><span class="wx-cond">Unavailable</span></div>'
+          + '<div class="wx-sub"></div>'
           + "</div>";
-        el.style.setProperty("display", "none", "important"); /* NODATA1 · no reading = no chip (never show a dash); comes back on the next good load. NODATA3 · !important so the phone header's display:flex !important can't show a bare dash */
+        if (el.id === "house-wx") el.style.removeProperty("display");
+        else el.style.setProperty("display", "none", "important");
         return;
       }
       paint(el, data);
@@ -266,5 +317,5 @@
     }
   }
 
-  global.HouseWeather = { load: load, paint: paint, mount: mount, PLACE: PLACE };
+  global.HouseWeather = { load: load, paint: paint, mount: mount, PLACE: PLACE, retrySteps: WX_STEPS };
 })(typeof window !== "undefined" ? window : globalThis);

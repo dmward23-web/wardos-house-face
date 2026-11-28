@@ -63,13 +63,23 @@
     return u;
   }
   function fetchWx(win, ms) {
-    var urls = wxUrls(win || root), i = 0;
+    var urls = wxUrls(win || root), i = 0, lastStatus = 0;
+    function giveUp() {
+      var e = new Error(lastStatus >= 500 ? "HTTP " + lastStatus : "no /wx reading");
+      e.status = lastStatus;
+      return Promise.reject(e);
+    }
     function next() {
-      if (i >= urls.length) return Promise.reject(new Error("no /wx reading"));
+      if (i >= urls.length) return giveUp();
       var u = urls[i++], ac = typeof AbortController === "function" ? new AbortController() : null, t = ac && setTimeout(function () { ac.abort(); }, ms || 8000);
-      return fetch(u, { cache: "no-store", signal: ac ? ac.signal : undefined }).then(function (r) { if (!r.ok) throw new Error("wx " + r.status); return r.json(); })
-        .then(function (j) { clearTimeout(t); if (!j || !j.raw || !parse(j.raw)) throw new Error("no reading"); return j; })
-        .catch(function () { clearTimeout(t); return next(); });
+      return fetch(u, { cache: "no-store", signal: ac ? ac.signal : undefined }).then(function (r) {
+        clearTimeout(t);
+        lastStatus = r.status || 0;
+        if (r.status === 401) { var denied = new Error("HTTP 401"); denied.status = 401; throw denied; }
+        if (!r.ok) throw new Error("wx " + r.status);
+        return r.json();
+      }).then(function (j) { if (!j || !j.raw || !parse(j.raw)) throw new Error("no reading"); return j; })
+        .catch(function (err) { clearTimeout(t); if (err && err.status === 401) return Promise.reject(err); return next(); });
     }
     return next();
   }

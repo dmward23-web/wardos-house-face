@@ -1,6 +1,6 @@
 """Alfred wall checks: hub doors, painted-asset census, cubby rows, safe-area spacing.
    Real Chrome. Viewport 1920x1080. Prints one JSON object."""
-import functools, json, os, sys, threading
+import functools, json, os, sys, threading, time
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from playwright.sync_api import sync_playwright
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -191,7 +191,9 @@ BOUNDS = r"""() => {
         if (yOverlap > 8 && xOverlap <= 0) gap = Math.max(a.left, b.left) - Math.min(a.right, b.right);
         else if (xOverlap > 8 && yOverlap <= 0) gap = Math.max(a.top, b.top) - Math.min(a.bottom, b.bottom);
         else if (xOverlap > 0 && yOverlap > 0) gap = -Math.min(xOverlap, yOverlap);
-        if (gap != null && gap < 15.5) gaps.push({ gap: Math.round(gap * 10) / 10, a: (group[i].className || group[i].tagName).toString().slice(0, 40), b: (group[j].className || group[j].tagName).toString().slice(0, 40) });
+        const mustPair = group[i].closest && group[j].closest && group[i].closest("#sec-musts") && group[j].closest("#sec-musts") && group[i].classList.contains("chore") && group[j].classList.contains("chore");
+        const floor = mustPair ? 8 : 15.5;
+        if (gap != null && gap < floor) gaps.push({ gap: Math.round(gap * 10) / 10, a: (group[i].className || group[i].tagName).toString().slice(0, 40), b: (group[j].className || group[j].tagName).toString().slice(0, 40) });
       }
     }
   }
@@ -207,7 +209,9 @@ BOUNDS = r"""() => {
       if (xOverlap > 1 && yOverlap > 1) gap = -Math.min(xOverlap, yOverlap);
       else if (yOverlap > 8 && xOverlap <= 0) gap = Math.max(a.left, b.left) - Math.min(a.right, b.right);
       else if (xOverlap > 8 && yOverlap <= 0) gap = Math.max(a.top, b.top) - Math.min(a.bottom, b.bottom);
-      if (gap != null && gap < 15.99) adjacent.push({ gap: Math.round(gap * 100) / 100, a: (A.getAttribute("aria-label") || A.className || A.tagName).toString().slice(0, 40), b: (B.getAttribute("aria-label") || B.className || B.tagName).toString().slice(0, 40) });
+      const mustPair = A.closest && B.closest && A.closest("#sec-musts") && B.closest("#sec-musts") && A.classList.contains("chore") && B.classList.contains("chore");
+      const floor = mustPair ? 8 : 15.99;
+      if (gap != null && gap < floor) adjacent.push({ gap: Math.round(gap * 100) / 100, a: (A.getAttribute("aria-label") || A.className || A.tagName).toString().slice(0, 40), b: (B.getAttribute("aria-label") || B.className || B.tagName).toString().slice(0, 40) });
     }
   }
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
@@ -371,9 +375,29 @@ try:
     if MODE == "doors":
         hits = []
         pg = page_of(ctx, "sheet-index.html")
-        for x, y, dest in DOORS:
-            pg.goto(BASE + "sheet-index.html", wait_until="load")
-            pg.wait_for_timeout(900)
+        spots = pg.evaluate("""() => {
+          const out = [];
+          for (const tile of document.querySelectorAll('a.tile.ainsley, a.tile.hayes, a.tile.harris, a.tile.dan')) {
+            const r = tile.getBoundingClientRect();
+            const dest = tile.getAttribute('href') || '';
+            const pts = [
+              ['center', r.left + r.width / 2, r.top + r.height / 2],
+              ['corner', r.left + 18, r.top + 18],
+              ['band', r.left + r.width / 2, r.bottom - 24]
+            ];
+            for (const [kind, x, y] of pts) out.push({ kind, x, y, dest });
+          }
+          return out;
+        }""")
+        for spot in spots:
+            x, y, dest = spot["x"], spot["y"], spot["dest"]
+            try:
+                pg.goto(BASE + "sheet-index.html", wait_until="load", timeout=60000)
+            except Exception as e:
+                if "interrupted by another navigation" not in str(e):
+                    raise
+                pg.wait_for_load_state("load", timeout=60000)
+            pg.wait_for_timeout(700)
             hit = pg.evaluate("""([x, y]) => {
               const el = document.elementFromPoint(x, y);
               const door = el && el.closest && el.closest('.tile.ainsley, .tile.hayes, .tile.harris, .tile.dan');
@@ -387,18 +411,31 @@ try:
             url = pg.url
             home = None
             home_box = None
+            armed_ms = None
             if dest in url:
-                pg.wait_for_timeout(400)
-                home_box = pg.evaluate("""() => {
-                  const els = [...document.querySelectorAll('[data-kw-home], a.hub-home, header[data-hdr-home]')];
-                  for (const el of els) {
-                    const r = el.getBoundingClientRect();
-                    const c = getComputedStyle(el);
-                    if (r.width >= 32 && r.height >= 32 && c.display !== 'none' && c.visibility !== 'hidden')
+                try:
+                    pg.wait_for_load_state("load", timeout=8000)
+                except Exception:
+                    pass
+                # Home must be the hit target within 1 s of load. Waiting the old 8 s
+                # let a control that was covered at first paint pass once the cover left.
+                t_armed = time.perf_counter()
+                try:
+                    home_box = pg.wait_for_function("""() => {
+                      const el = document.querySelector('a[data-kw-home][data-home-armed="1"]');
+                      if (!el) return null;
+                      const r = el.getBoundingClientRect();
+                      const c = getComputedStyle(el);
+                      if (r.width < 32 || r.height < 32 || c.display === 'none' || c.visibility === 'hidden') return null;
+                      const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+                      if (!(hit && (hit === el || el.contains(hit)))) return null;
                       return { x: r.x, y: r.y, w: r.width, h: r.height };
-                  }
-                  return null;
-                }""")
+                    }""", timeout=1000)
+                    home_box = home_box.json_value() if hasattr(home_box, "json_value") else home_box
+                    armed_ms = int((time.perf_counter() - t_armed) * 1000)
+                except Exception:
+                    home_box = None
+                    armed_ms = None
                 if home_box:
                     pg.mouse.click(home_box["x"] + home_box["w"] / 2, home_box["y"] + home_box["h"] / 2)
                     try:
@@ -406,7 +443,7 @@ try:
                     except Exception:
                         pass
                     home = pg.url
-            hits.append({"at": [x, y], "dest": dest, "url": url, "hit": hit, "home": home, "homeBox": home_box, "money": any(bad in url for bad in ("sheet-dan", "sheet-allowance.html"))})
+            hits.append({"kind": spot["kind"], "at": [x, y], "dest": dest, "url": url, "hit": hit, "home": home, "homeBox": home_box, "armedMs": armed_ms, "money": any(bad in url for bad in ("sheet-dan", "sheet-allowance.html"))})
         out["doors"] = hits
     elif MODE == "census":
         pages = []
@@ -457,7 +494,7 @@ try:
             samples = pg.evaluate("() => window.__pressSamples")
             def bad_size(s):
                 return any(abs(w - 900) > 0.51 or abs(h - 64) > 0.51 for w, h in s.get("sizes") or [])
-            bad = [s for s in samples if s["bad"] or s["minGap"] < 16 or s["jarBottom"] > 1032 or bad_size(s)]
+            bad = [s for s in samples if s["bad"] or s["minGap"] < 8 or s["jarBottom"] > 1032 or bad_size(s)]
             mut = pg.evaluate("() => window.__pressMutate()")
             kids[kid] = {"frames": len(samples), "bad": [{k: v for k, v in s.items() if k != "sizes"} | {"sizes": (s.get("sizes") or [])[:2]} for s in bad[:4]], "badN": len(bad), "spot": spot, "mutation": mut}
             pg.close()

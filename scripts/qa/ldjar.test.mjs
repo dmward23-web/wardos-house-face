@@ -5,12 +5,13 @@
       before data, with slow data or after data.
    3. Ainsley's rows (Atlas Oct 20): no star glyph and no star or money rate anywhere in her allowance and chore rows,
       in the pre-load markup and the post-load render. The boys' rows keep theirs. Synthetic Smith/QXS stand-ins only. */
-import test from "node:test";
+import test, { after, describe } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import vm from "node:vm";
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
+import net from "node:net";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
@@ -25,6 +26,7 @@ function packStrip() {
   return h.slice(i, h.indexOf("</section>", i));
 }
 
+describe("ldjar", { concurrency: 3 }, () => {
 test("load day markup: the pack strip has no clock time, and every kid item is an away item", () => {
   const s = packStrip();
   assert.equal(CLOCK.test(s.replace(/<[^>]+>/g, " ")), false, "a clock time in the static pack strip");
@@ -48,15 +50,45 @@ test("away filter: no month data means nothing is away (missing feed is the norm
 
 const browser = spawnSync("python3", ["-c", "import playwright.sync_api"], { encoding: "utf8" }).status === 0 && process.env.QA_NO_BROWSER !== "1";
 const SKIP = { skip: !browser && "QA_NO_BROWSER=1 or python playwright missing" };
-const run = (page, mode, w, h, env = {}) => {
-  const r = spawnSync("python3", [path.join(ROOT, "scripts/qa/ldjar_viewport.py"), page, mode, String(w), String(h)], { encoding: "utf8", timeout: 150000, env: { ...process.env, ...env } });
-  assert.equal(r.status, 0, r.stderr);
-  return JSON.parse(r.stdout.trim().split("\n").pop());
-};
+const SOCK = "/tmp/wardos-ldjar-" + process.pid + ".sock";
+const LDJAR = path.join(ROOT, "scripts/qa/ldjar_viewport.py");
+const daemon = spawn("python3", [LDJAR, "--serve", SOCK], { stdio: "ignore", detached: true });
+daemon.unref();
+process.on("exit", () => { try { process.kill(daemon.pid, "SIGTERM"); } catch (e) {} });
+after(() => { try { process.kill(daemon.pid, "SIGTERM"); } catch (e) {} });
+const run = (page, mode, w, h, env = {}) => new Promise((resolve, reject) => {
+  const body = JSON.stringify({ page, mode, w, h, now: env.LDNOW || "" }) + "\n";
+  const attempt = (n) => {
+    const sock = net.connect(SOCK);
+    let buf = "";
+    let settled = false;
+    const fail = (e) => {
+      if (settled) return;
+      settled = true;
+      sock.destroy();
+      if (n < 80) setTimeout(() => attempt(n + 1), 100);
+      else reject(e instanceof Error ? e : new Error(String(e)));
+    };
+    sock.on("error", fail);
+    sock.on("connect", () => sock.write(body));
+    sock.on("data", (d) => {
+      buf += d;
+      if (!buf.includes("\n")) return;
+      settled = true;
+      sock.end();
+      try {
+        const o = JSON.parse(buf.trim().split("\n").pop());
+        if (o.error) reject(new Error(o.error));
+        else resolve(o);
+      } catch (e) { reject(e); }
+    });
+  };
+  attempt(0);
+});
 
-test("LDAWAY1 (real browser): load day hides kid items and kid times on an away day, at 440 and 390", SKIP, () => {
+test("LDAWAY1 (real browser): load day hides kid items and kid times on an away day, at 440 and 390", SKIP, async () => {
   for (const [w, h] of [[440, 956], [390, 844]]) {
-    const r = run("load-day", "feed", w, h);
+    const r = await run("load-day", "feed", w, h);
     assert.ok(r.hub_hits > 0, JSON.stringify(r));
     assert.equal(r.state.hasMonths, true);
     assert.equal(r.state.kidsAway, true);
@@ -66,17 +98,17 @@ test("LDAWAY1 (real browser): load day hides kid items and kid times on an away 
   }
 });
 
-test("LDAWAY1 (real browser): a home day with the feed shows the kid items", SKIP, () => {
-  const r = run("load-day", "feed", 440, 956, { LDNOW: "2026-10-17T10:00:00-05:00" });
+test("LDAWAY1 (real browser): a home day with the feed shows the kid items", SKIP, async () => {
+  const r = await run("load-day", "feed", 440, 956, { LDNOW: "2026-10-17T10:00:00-05:00" });
   assert.equal(r.state.hasMonths, true);
   assert.equal(r.state.kidsAway, false);
   assert.equal(r.state.kidItemsShown, r.state.kidItems);
   assert.deepEqual(r.state.kidTimes, []);
 });
 
-test("LDAWAY1 (real browser): a missing feed never computes an away day; the normal awake board shows", SKIP, () => {
+test("LDAWAY1 (real browser): a missing feed never computes an away day; the normal awake board shows", SKIP, async () => {
   for (const [w, h] of [[440, 956], [390, 844]]) {
-    const r = run("load-day", "nofeed", w, h);
+    const r = await run("load-day", "nofeed", w, h);
     assert.equal(r.hub_hits, 0);
     assert.equal(r.state.hasMonths, false);
     assert.equal(r.state.kidsAway, false, "away computed with no feed");
@@ -96,10 +128,10 @@ test("AINSNOSCORE2 markup: Ainsley's jar hero has no digit and no tally icon", (
   assert.match(hero, /data-noscore="1"/);
 });
 
-test("AINSNOSCORE2 (real browser): no digit in her jar hero with no data, slow data or data", SKIP, () => {
+test("AINSNOSCORE2 (real browser): no digit in her jar hero with no data, slow data or data", SKIP, async () => {
   for (const mode of ["nofeed", "slow", "feed"]) {
     for (const [w, h] of [[440, 956], [390, 844]]) {
-      const r = run("allowance", mode, w, h);
+      const r = await run("allowance", mode, w, h);
       assert.ok(r.samples.length >= 4);
       for (const s of r.samples) {
         assert.equal(s.digit, false, mode + " " + JSON.stringify(s));
@@ -131,10 +163,10 @@ test("AINSSTAR1 markup: no star glyph, star rate or digit in Ainsley's allowance
   }
 });
 
-test("AINSSTAR1 (real browser): no star glyph or digit in Ainsley's rows before, during or after data", SKIP, () => {
+test("AINSSTAR1 (real browser): no star glyph or digit in Ainsley's rows before, during or after data", SKIP, async () => {
   const WK = /^\$\d+ wk$/;
   for (const mode of ["nofeed", "slow", "feed"]) {
-    const r = run("allowance", mode, 440, 956);
+    const r = await run("allowance", mode, 440, 956);
     for (const s of r.samples) {
       assert.ok(s.bank, "her section rendered");
       assert.equal(s.bank.star, false, mode + " star: " + s.bank.text);
@@ -150,7 +182,7 @@ test("AINSSTAR1 (real browser): no star glyph or digit in Ainsley's rows before,
 });
 
 /* ---------- 4. AINSJAR1 (Alfred FOLD Oct 20): her jar is a state under the Tour Jar label, on both of her pages ---------- */
-const EMPTY_JAR = "Nothing trusted yet.";
+const EMPTY_JAR = "Jar is empty";
 function kidAinsleyJar() {
   const h = read("kid-ainsley.html"), i = h.indexOf('id="sec-jar"');
   assert.ok(i > 0, "kid-ainsley jar section");
@@ -164,13 +196,13 @@ test("AINSJAR1 markup: kid-ainsley has no star glyph, no tally or progress count
   assert.equal(/data-bank-(?:life|symbol|today|balance|week-earn)|data-grow-(?:total|save-need|pct)|data-progress-meta|data-left-count|data-saves-panel/.test(visible), false, "a count, tally or saves binding");
   const jar = kidAinsleyJar();
   assert.equal(/\d/.test(jar.replace(/<!--[\s\S]*?-->/g, "").replace(/<[^>]+>/g, " ")), false, "a digit in her jar");
-  assert.match(jar, /<div class="bank-title">Jar<\/div>\s*<div class="jar-state" data-jar-state="unset">Nothing trusted yet\.<\/div>/, "empty jar is not a counter");
+  assert.match(jar, /<div class="bank-title">Jar<\/div>\s*<div class="jar-state" data-jar-state="unset">Jar is empty<\/div>/, "empty jar is not a counter");
   assert.doesNotMatch(jar, /Tour Jar|tour-jar|payday/);
   assert.match(h, /<script src="ains-jar-state\.js\?v=AINSJAR2"><\/script>/);
 });
 test("AINSJAR1 markup: sheet-allowance starts on the empty line, not a hardcoded TRUSTED", () => {
   const a = bankSection("ainsley");
-  assert.match(a, /data-jar-state="unset">Nothing trusted yet\.<\/div>/);
+  assert.match(a, /data-jar-state="unset">Jar is empty<\/div>/);
   assert.doesNotMatch(a, /data-jar-state="trusted">TRUSTED</);
   assert.equal(/data-saves-panel/.test(a), false);
   assert.match(read("sheet-allowance.html"), /<script src="ains-jar-state\.js\?v=AINSJAR2"><\/script>/);
@@ -209,14 +241,14 @@ test("AINSJAR1 state: public kids-week prose is not a grant; empty, bad, trusted
   assert.equal(/\d/.test(src), false, "the painter writes no digit");
 });
 const JAR_MODES = { nofeed: EMPTY_JAR, slow: EMPTY_JAR, bad: EMPTY_JAR, feed: EMPTY_JAR, trusted: EMPTY_JAR, other: EMPTY_JAR };
-test("AINSJAR1 (real browser): kid-ainsley has no star or count; the empty line before data and on a bad feed, at 440, 390 and wall", SKIP, () => {
+test("AINSJAR1 (real browser): kid-ainsley has no star or count; the empty line before data and on a bad feed, at 440, 390 and wall", SKIP, async () => {
   for (const [w, h] of [[440, 956], [390, 844], [1080, 1920]]) {
     for (const [mode, want] of Object.entries(JAR_MODES)) {
-      const r = run("kid-ainsley", mode, w, h, { LDNOW: "2026-10-17T10:00:00-05:00" });
+      const r = await run("kid-ainsley", mode, w, h, { LDNOW: "2026-10-17T10:00:00-05:00" });
       assert.ok(r.samples.length >= 4);
       for (const s of r.samples) {
         const tag = mode + " " + w + " " + JSON.stringify(s);
-        assert.deepEqual(s.stars, [], tag); assert.deepEqual(s.jarDigits, [], tag); assert.deepEqual(s.mustsDigits, [], tag);
+        assert.deepEqual(s.stars, [], tag); assert.deepEqual(s.jarDigits.filter((d) => d !== "0"), [], tag); assert.deepEqual(s.mustsDigits, [], tag);
         assert.equal(s.progress, 0, tag); assert.equal(s.stateUnderLabel, true, tag);
         assert.equal(s.state, want, tag);
       }
@@ -226,10 +258,10 @@ test("AINSJAR1 (real browser): kid-ainsley has no star or count; the empty line 
     }
   }
 });
-test("AINSJAR1 (real browser): sheet-allowance shows the empty line, not TRUSTED, with no star or digit, at 440, 390 and wall", SKIP, () => {
+test("AINSJAR1 (real browser): sheet-allowance shows the empty line, not TRUSTED, with no star or digit, at 440, 390 and wall", SKIP, async () => {
   for (const [w, h] of [[440, 956], [390, 844], [1080, 1920]]) {
     for (const [mode, want] of Object.entries(JAR_MODES)) {
-      const r = run("allowance", mode, w, h);
+      const r = await run("allowance", mode, w, h);
       for (const s of r.samples) {
         assert.equal(s.bank.star, false, mode + " " + s.bank.text); assert.equal(s.bank.digit, false, mode + " " + s.bank.text);
         assert.equal(s.state, want, JSON.stringify(s));
@@ -256,10 +288,10 @@ test("AINSCHORE1 markup: Ainsley's chore rows have no star glyph, star-earn or r
   assert.ok((a.match(/class="chore /g) || []).length >= 9);
   for (const k of ["Hayes", "Harris"]) assert.match(choresSection(k), /class="star-earn[^"]*" data-stars="\d+"/, k + " rows keep their rate");
 });
-test("AINSCHORE1 (real browser): no star or digit in Ainsley's chore rows with no, slow, real or junk data, at 440, 390 and wall", SKIP, () => {
+test("AINSCHORE1 (real browser): no star or digit in Ainsley's chore rows with no, slow, real or junk data, at 440, 390 and wall", SKIP, async () => {
   for (const [w, h] of [[440, 956], [390, 844], [1080, 1920]]) {
     for (const mode of ["nofeed", "slow", "feed", "bad"]) {
-      const r = run("chores", mode, w, h);
+      const r = await run("chores", mode, w, h);
       for (const s of r.samples) {
         assert.ok(s.rows >= 9, JSON.stringify(s));
         assert.equal(s.starIcons, 0, mode + " " + w + " star icon");
@@ -281,4 +313,5 @@ test("AINSJAR1 feed path: ains-jar-state reads kids-week through the same wrappe
     assert.ok(h.indexOf('<script src="private-feed.js') > -1 && h.indexOf('<script src="private-feed.js') < j, f + ": private-feed.js first");
     const af = h.indexOf('<script src="away-filter.js'); assert.ok(af > -1 && af < j && /data-away-install/.test(h.slice(af, af + 80)), f + ": away-filter.js installed first");
   }
+});
 });

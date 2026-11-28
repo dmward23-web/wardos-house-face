@@ -8,7 +8,8 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
-const OUT = "/opt/cursor/artifacts/acer-wall-spec.json";
+const ART = process.env.ARTIFACT_DIR || "/opt/cursor/artifacts";
+const OUT = path.join(ART, "acer-wall-spec.json");
 
 function dims(buf) {
   if (buf.length > 24 && buf[0] === 0x89 && buf[1] === 0x50) return { w: buf.readUInt32BE(16), h: buf.readUInt32BE(20), kind: "png" };
@@ -63,7 +64,7 @@ test("Acer wall spec report lists asset dimensions and does not resize them", { 
     const d = dims(buf);
     const name = path.relative(ROOT, rel);
     const fullBleed = /\/wall-(?:dusk|morning|night)\.webp$/.test(name) || /bg-wall/.test(name);
-    const windowArt = /hub-window-(?:dusk|night)-900x864\.webp$/.test(name);
+    const windowArt = /hub-window-(?:day|dusk|night)-900x864\.webp$/.test(name);
     const kidTile = /kidtile-(?:ainsley|hayes|harris)-438x420\.webp$/.test(name) || /kidtile-dad\.webp$/.test(name);
     const required = fullBleed ? "1920x1080" : windowArt ? "900x864" : kidTile ? "438x420" : null;
     const want = required && /^(\d+)x(\d+)/.exec(required);
@@ -110,7 +111,8 @@ test("Acer wall spec report lists asset dimensions and does not resize them", { 
     assets,
     offSpecAssets: assets.filter((a) => a.offSpec).map((a) => a.path + " " + a.width + "x" + a.height + " required " + a.required)
   };
-  fs.writeFileSync("/opt/cursor/artifacts/prism-slot-art-sha256.txt", sha256.join("\n") + "\n");
+  fs.mkdirSync(ART, { recursive: true });
+  fs.writeFileSync(path.join(ART, "prism-slot-art-sha256.txt"), sha256.join("\n") + "\n");
   fs.mkdirSync(path.dirname(OUT), { recursive: true });
   fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
   assert.equal(layout.panel.w, 1920);
@@ -136,9 +138,10 @@ test("Acer wall spec report lists asset dimensions and does not resize them", { 
   assert.match(layout.kidArt, /kidtile-ainsley-438x420\.webp/);
   assert.match(layout.dadArt, /kidtile-dad\.webp/);
   assert.deepEqual(report.pendingArt, []);
+  /* The event band is 140px and sits on the tile's bottom border. */
   assert.equal(layout.dadStage.h, 140);
-  assert.equal(layout.dadStage.gap, 0);
-  assert.ok(sha256.some((line) => line.startsWith("b02d87273eaf09ecd755a27d8ccd9e0986a7bdd0bc25b73b5839f4952f2c8105  month-theme/hub/kidtile-dad.webp")));
+  assert.equal(layout.dadStage.gap, 2);
+  assert.ok(sha256.some((line) => line.startsWith("sha256:b02d87273eaf09ecd755a27d8ccd9e0986a7bdd0bc25b73b5839f4952f2c8105".slice(7) + "  month-theme/hub/kidtile-dad.webp")));
   assert.doesNotMatch(fs.readFileSync(path.join(ROOT, "month-theme/month-overlay.js"), "utf8"), /40x40|leaf-[^"']*-40/);
   assert.deepEqual(report.offSpecAssets, []);
 });

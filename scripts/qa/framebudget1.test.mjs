@@ -1,9 +1,10 @@
 /* FRAMEBUDGET1 · the night scene's frame-budget governor (night/scene.html and wall.html). A slow scene pauses, crossfades to the
    LHVID1 still poster and stops its render loop (no rAF after the fallback); prefers-reduced-motion goes straight to the poster;
-   the back layer is uploaded only when it changes. Static half always runs; the browser half needs puppeteer-core + chrome
-   (skips cleanly otherwise). No frames are stored. */
+   the back layer is uploaded only when it changes. Static half always runs; the browser half uses the CDP helper
+   (scripts/qa/cdp-lite.mjs) and skips only when QA_NO_BROWSER=1. No frames are stored. */
 import test from "node:test"; import assert from "node:assert/strict"; import fs from "node:fs"; import path from "node:path"; import http from "node:http";
-import { fileURLToPath } from "node:url"; import { createRequire } from "node:module";
+import { fileURLToPath } from "node:url";
+import { launchChrome, openPage } from "./cdp-lite.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const SC = ["night/scene.html", "wall.html"].map((f) => [f, fs.readFileSync(path.join(ROOT, f), "utf8")]);
 const block = (s) => { const a = s.indexOf("// FRAMEBUDGET1 · frame-budget governor"), b = s.indexOf("function fbStart()"); return a > 0 && b > a ? s.slice(a, s.indexOf("\n", b)) : null; };
@@ -22,16 +23,16 @@ test("static: one governor, same in both scenes, thresholds and poster wiring", 
     assert.match(s, /#poster\{opacity:0;pointer-events:none;transition:opacity \.4s ease\}/, f + " soft 400 ms crossfade");
     assert.match(s, /if\(fbWatch\(now,d\)\)return;RAF=requestAnimationFrame\(loop\)/, f + " loop asks the governor before every rAF");
     assert.match(s, /\nelse fbStart\(\);/, f + " start goes through the governor");
+    assert.match(x, /function fbStillWatch/, f + " the still poster redraws when its plate loads");
     assert.equal((s.match(/requestAnimationFrame\(loop\)/g) || []).length, 3, f + " rAF(loop) only in loop, fbLive and fbStart");
     assert.match(s, /if\(SBup\)\{gl\.activeTexture\(gl\.TEXTURE1\);gl\.texImage2D\([^)]*sB\)\}/, f + " back layer uploaded only on change");
     assert.doesNotMatch(s, /gl\.activeTexture\(gl\.TEXTURE1\);gl\.texImage2D\(gl\.TEXTURE_2D,0,gl\.RGBA,gl\.RGBA,gl\.UNSIGNED_BYTE,sB\);gl/, f + " no unconditional back-layer upload");
   }
 });
 
-const NO_BROWSER = process.env.QA_NO_BROWSER === "1";   /* DAYPKG1 item 3 · QA_NO_BROWSER=1: puppeteer-core is never loaded and no Chrome path is resolved, so nothing below can launch */
-let pp = null; if (!NO_BROWSER) for (const base of [import.meta.url, (process.env.WARDOS_DEPS || "/nonexistent") + "/", "/tmp/h1-deps/node_modules/", "/tmp/ori-qa/node_modules/"]) { try { pp = createRequire(base)("puppeteer-core"); break; } catch (_) {} }
+const NO_BROWSER = process.env.QA_NO_BROWSER === "1";   /* DAYPKG1 item 3 · QA_NO_BROWSER=1: Chrome is never launched */
 const CHROME = NO_BROWSER ? null : (process.env.CHROME_PATH || ["/usr/local/bin/google-chrome", "/usr/bin/google-chrome"].find((c) => fs.existsSync(c)) || null);
-const SKIP = NO_BROWSER ? "SKIP QA_NO_BROWSER=1 (no Chrome launch)" : (!(pp && CHROME) && "needs puppeteer-core + chrome");
+const SKIP = NO_BROWSER ? "SKIP QA_NO_BROWSER=1 (no Chrome launch)" : false;
 /* counts every rAF request; with __slow set each frame callback busy-waits 200 ms (a forced slow frame) */
 const HOOK = () => { const raf = window.requestAnimationFrame.bind(window); window.__rafN = 0; window.__slow = false;
   window.requestAnimationFrame = (cb) => { window.__rafN++; return raf((t) => { if (window.__slow) { const e = performance.now() + 200; while (performance.now() < e); } cb(t); }); }; };
@@ -42,19 +43,118 @@ async function withScene(fn) {
     const f = path.join(ROOT, path.normalize(rel).replace(/^(\.\.(\/|\\|$))+/, ""));
     fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); r.end(); return; } r.writeHead(200, { "Content-Type": types[path.extname(f)] || "application/octet-stream" }); r.end(b); }); });
   await new Promise((ok) => srv.listen(0, "127.0.0.1", ok)); const base = "http://127.0.0.1:" + srv.address().port;   /* loopback only */
-  const b = await pp.launch({ executablePath: CHROME, args: ["--no-sandbox", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--disable-background-timer-throttling", "--disable-renderer-backgrounding"] });
+  assert.ok(CHROME, "chrome is required");
+  const b = await launchChrome(CHROME);
+  b.newPage = () => openPage(b.port);
   try { await fn(b, base); } finally { await b.close(); srv.close(); }
 }
 const state = (g) => g.evaluate(() => ({ mode: document.documentElement.getAttribute("data-scene-mode"), why: window.__fb && __fb.why, raf: window.__rafN,
   po: getComputedStyle(document.getElementById("poster")).opacity, gl: getComputedStyle(document.getElementById("gl")).visibility,
   ink: (() => { const c = document.getElementById("poster"); if (!c.width) return 0; const d = c.getContext("2d").getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 0; i < d.length; i += 64) if (Math.abs(d[i] - 4) + Math.abs(d[i + 1] - 6) + Math.abs(d[i + 2] - 10) > 12) n++; return n; })() }));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const PLATE_MARK = `(() => {
+  const desc = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, "src");
+  Object.defineProperty(HTMLImageElement.prototype, "src", {
+    configurable: true,
+    get() { return desc.get.call(this); },
+    set(v) {
+      if (typeof v === "string" && v.indexOf("/poster/") !== -1) {
+        this.addEventListener("load", function () {
+          const now = performance.now();
+          (window.__plateLoads = window.__plateLoads || []).push(now);
+          if (!window.__plateLoadAt) window.__plateLoadAt = now;
+        }, { once: true });
+      }
+      desc.set.call(this, v);
+    }
+  });
+})()`;
+/* RMSTILL1 · hold the plate, and stretch the 120 ms still-poster poll, so only a load listener paints inside 500 ms. */
+const PLATE_DELAY = `(() => {
+  const orig = window.setTimeout.bind(window);
+  const origInterval = window.setInterval.bind(window);
+  window.__stretch = 0;
+  window.setTimeout = function (fn, ms, ...rest) {
+    if (ms === 120 && typeof fn === "function" && /fbStillDraw/.test(Function.prototype.toString.call(fn))) {
+      window.__stretch++;
+      ms = 30000;
+    }
+    return orig(fn, ms, ...rest);
+  };
+  window.setInterval = function (fn, ms, ...rest) {
+    if (ms === 1000 && typeof fn === "function" && /FB\.plate/.test(Function.prototype.toString.call(fn))) {
+      window.__stretch++;
+      ms = 30000;
+    }
+    return origInterval(fn, ms, ...rest);
+  };
+  const desc = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, "src");
+  Object.defineProperty(HTMLImageElement.prototype, "src", {
+    configurable: true,
+    get() { return desc.get.call(this); },
+    set(v) {
+      if (typeof v === "string" && v.indexOf("/poster/") !== -1 && !this.__plateHeld) {
+        this.__plateHeld = true;
+        const img = this;
+        orig(() => {
+          img.addEventListener("load", function () {
+            const now = performance.now();
+            (window.__plateLoads = window.__plateLoads || []).push(now);
+            if (!window.__plateLoadAt) window.__plateLoadAt = now;
+          }, { once: true });
+          desc.set.call(img, v);
+        }, 700);
+        return;
+      }
+      desc.set.call(this, v);
+    }
+  });
+})()`;
+async function inkSoon(g, label, fromLoad) {
+  if (fromLoad) await g.waitForFunction(() => window.__plateLoadAt > 0, { timeout: 8000, polling: 50 });
+  const got = await g.evaluate((fromLoad) => new Promise((res) => {
+    const t0 = performance.now();
+    function ink() {
+      const c = document.getElementById("poster");
+      if (!c || !c.width) return 0;
+      const w = 80, h = 45;
+      const x = Math.max(0, (c.width - w) / 2), y = Math.max(0, (c.height - h) / 2);
+      const d = c.getContext("2d").getImageData(x, y, w, h).data;
+      let n = 0;
+      for (let i = 0; i < d.length; i += 16) if (Math.abs(d[i] - 4) + Math.abs(d[i + 1] - 6) + Math.abs(d[i + 2] - 10) > 12) n++;
+      return n;
+    }
+    function step() {
+      const n = ink();
+      const loads = window.__plateLoads || [];
+      const last = loads.length ? loads[loads.length - 1] : t0;
+      const since = fromLoad ? performance.now() - last : performance.now() - t0;
+      const cap = fromLoad ? 500 : 2300;
+      if (n > 50 || since > cap) return res({ ink: n, since: since });
+      requestAnimationFrame(step);
+    }
+    step();
+  }), fromLoad);
+  const cap = fromLoad ? 500 : 2300;
+  console.log(label + " ink " + got.ink + " at " + Math.round(got.since) + " ms");
+  assert.ok(got.ink > 50, label + " poster ink " + got.ink + " at " + Math.round(got.since) + " ms");
+  assert.ok(got.since <= cap, label + " ink landed " + Math.round(got.since) + " ms after " + (fromLoad ? "the plate load" : "poster mode"));
+}
+/* NOSPOOK1 · wall.html's porch engine (and so its governor and poster) is October-only; every other month month-overlay hides
+   #poster/#gl. The wall.html legs pin the in-page clock (ticking, offset) to Oct 20 so the porch governor stays under test all
+   year; the off-season leg below pins Nov 23 and checks the engine stays hidden and quiet. */
+const PIN = (iso) => { const R = Date, off = R.parse(iso) - R.now();
+  function D(...a) { if (!new.target) return new R(R.now() + off).toString(); return a.length ? new R(...a) : new R(R.now() + off); }
+  D.prototype = R.prototype; D.now = () => R.now() + off; D.parse = R.parse; D.UTC = R.UTC; window.Date = D; };
+const OCT = "2026-10-20T18:00:00Z", OFF = "2026-11-23T18:00:00Z";
 
 test("browser: a forced slow frame falls back to the poster and no rAF runs after the fallback", { skip: SKIP, timeout: 120000 }, async () => {
   await withScene(async (b, base) => { for (const f of ["night/scene.html", "wall.html"]) {
     const g = await b.newPage(); await g.setViewport({ width: 440, height: 956 }); await g.evaluateOnNewDocument(HOOK);
+    if (f === "wall.html") await g.evaluateOnNewDocument(PIN, OCT);
     /* SOFTGL1 · this runner is software WebGL, where scene.html now shows the poster at once; ?gl=soft keeps its live scene so the governor is still the thing under test */
-    await g.goto(base + "/" + f + (f === "night/scene.html" ? "?gl=soft" : ""), { waitUntil: "load" });
+    /* ?gl=soft on both files: this runner is software WebGL, and wall.html now takes the still poster at once unless asked to keep the live scene. */
+    await g.goto(base + "/" + f + (f === "wall.html" ? "?gl=soft&look=classic" : "?gl=soft"), { waitUntil: "load" });
     await g.waitForFunction(() => window.__fb && document.documentElement.getAttribute("data-scene-mode"), { timeout: 30000, polling: 100 });
     await g.evaluate(() => { window.__slow = true; });
     await g.waitForFunction(() => document.documentElement.getAttribute("data-scene-mode") === "poster", { timeout: 30000, polling: 100 });
@@ -71,11 +171,46 @@ test("browser: a forced slow frame falls back to the poster and no rAF runs afte
 test("browser: prefers-reduced-motion goes straight to the poster with no render loop", { skip: SKIP, timeout: 120000 }, async () => {
   await withScene(async (b, base) => { for (const f of ["night/scene.html", "wall.html"]) {
     const g = await b.newPage(); await g.setViewport({ width: 440, height: 956 }); await g.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
-    await g.evaluateOnNewDocument(HOOK); await g.goto(base + "/" + f, { waitUntil: "load" });
+    await g.evaluateOnNewDocument(HOOK); if (f === "wall.html") await g.evaluateOnNewDocument(PIN, OCT);
+    await g.evaluateOnNewDocument(PLATE_MARK);
+    await g.goto(base + "/" + f + (f === "wall.html" ? "?look=classic" : ""), { waitUntil: "load" });
     await g.waitForFunction(() => document.documentElement.getAttribute("data-scene-mode") === "poster", { timeout: 30000, polling: 100 });
-    await sleep(800); const s0 = await state(g); await sleep(1500); const s1 = await state(g);
+    await inkSoon(g, f, false);
+    const s0 = await state(g); await sleep(1500); const s1 = await state(g);
     assert.equal(s0.why, "reduced-motion", f); assert.equal(s1.raf, s0.raf, f + " no rAF in reduced motion");
     assert.equal(s1.po, "1", f + " poster shown"); assert.ok(s1.ink > 50, f + " poster painted (" + s1.ink + ")");
+    await g.close();
+  } });
+});
+
+test("RMSTILL1 a delayed plate stays blank unless the load event redraws it", { skip: SKIP, timeout: 120000 }, async () => {
+  await withScene(async (b, base) => {
+    const g = await b.newPage();
+    await g.setViewport({ width: 440, height: 956 });
+    await g.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
+    await g.evaluateOnNewDocument(HOOK);
+    await g.evaluateOnNewDocument(PLATE_DELAY);
+    await g.goto(base + "/night/scene.html", { waitUntil: "load" });
+    await g.waitForFunction(() => document.documentElement.getAttribute("data-scene-mode") === "poster", { timeout: 30000, polling: 100 });
+    await inkSoon(g, "delayed plate stretch " + (await g.evaluate(() => window.__stretch || 0)), true);
+    await g.close();
+  });
+});
+
+test("browser: off-season (Nov 23) wall.html keeps the porch engine hidden, poster and WebGL invisible, no rAF after load", { skip: SKIP, timeout: 120000 }, async () => {
+  await withScene(async (b, base) => { for (const rm of [false, true]) {
+    const g = await b.newPage(); await g.setViewport({ width: 440, height: 956 });
+    if (rm) await g.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
+    await g.evaluateOnNewDocument(HOOK); await g.evaluateOnNewDocument(PIN, OFF); await g.goto(base + "/wall.html?look=classic", { waitUntil: "load" });
+    await g.waitForFunction(() => window.__fb && document.documentElement.getAttribute("data-scene-mode"), { timeout: 30000, polling: 100 });
+    await sleep(2500); const s0 = await state(g); await sleep(1500); const s1 = await state(g);
+    const hide = await g.evaluate(() => ({ hw: document.documentElement.getAttribute("data-halloween"), pov: getComputedStyle(document.getElementById("poster")).visibility,
+      glo: getComputedStyle(document.getElementById("gl")).opacity, y: new Date().getMonth() + 1 }));
+    const tag = "wall.html Nov 23" + (rm ? " reduced-motion" : "");
+    assert.equal(hide.y, 11, tag + " clock pinned to November");
+    assert.equal(hide.hw, "off", tag + " NOSPOOK1 flag set"); assert.equal(s1.po, "0", tag + " poster not shown"); assert.equal(hide.pov, "hidden", tag + " poster hidden");
+    assert.equal(s1.gl, "hidden", tag + " WebGL scene hidden"); assert.equal(hide.glo, "0", tag + " WebGL scene transparent");
+    assert.equal(s1.raf, s0.raf, tag + " no rAF after load (" + s0.why + ")");
     await g.close();
   } });
 });

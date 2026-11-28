@@ -21,6 +21,8 @@ import { createRequire } from "node:module";
 import { ctMidnight, ctMidnightIso } from "./ct-midnight.mjs"; /* DATA1 P1-5 */
 createRequire(import.meta.url)("../house-face-law.js");   /* PRIVFEED3 · LAW8C1: sets globalThis.HouseFaceLaw (one dress-up law, shared with the glass) */
 const FACE_LAW = globalThis.HouseFaceLaw;
+createRequire(import.meta.url)("../house-event-display.js"); /* KID-FEED-SAFETY · deny provider/therapy before glass text */
+const DISPLAY = globalThis.HouseEventDisplay;
 /* SCHOOLNAMES1 · school code from private-names.tsv role "school" (school-names.js); none known = no pinned specials */
 const SCHOOL_SPECIALS_RE = new RegExp("(?:" + createRequire(import.meta.url)("../school-names.js").alt() + ") specials?", "i");
 const PARTNER_RE = namesRe("partner"); /* PRIVNAME1 · "us" flag computed on the box so no name lives in client code */
@@ -34,6 +36,7 @@ function parseArgs(argv) {
     eventsPath: null,
     outPath: privPath("cal-live.json"), /* PRIVFEED1 · box-only, served by the hub with a token */
     patchWeek: null,
+    now: null,
     help: false,
   };
   for (let i = 2; i < argv.length; i++) {
@@ -45,7 +48,8 @@ function parseArgs(argv) {
         argv[i + 1] && !argv[i + 1].startsWith("-")
           ? path.resolve(argv[++i])
           : privPath("kids-week.json");
-    } else if (a === "--help" || a === "-h") out.help = true;
+    } else if (a === "--now" && argv[i + 1]) out.now = argv[++i];
+    else if (a === "--help" || a === "-h") out.help = true;
   }
   return out;
 }
@@ -210,6 +214,7 @@ function slimEvent(e) {
 }
 
 export function shortPlace(summary) {
+  if (DISPLAY && DISPLAY.isDenied({ summary: summary, title: summary })) return "";
   let s = String(summary || "").trim();
   s = s.replace(/^Leave\s*[·•\-–—]\s*/i, "");
   /* Kid-safe: parenthesised adult notes never reach the glass strip */
@@ -543,7 +548,7 @@ function main() {
     process.exit(args.help ? 0 : 1);
   }
 
-  const now = new Date();
+  const now = args.now ? new Date(args.now) : new Date();
   const todayIso = chicagoIso(now);
   const fetchedAt = now.toISOString();
 

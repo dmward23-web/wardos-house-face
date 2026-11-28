@@ -705,18 +705,16 @@
     var allOn = doc.getElementById("lights-all-on");
     var allOff = doc.getElementById("lights-all-off");
     var armed = canWrite();
-    if (allOn) {
-      allOn.disabled = !armed;
-      allOn.style.pointerEvents = armed ? "auto" : "none";
-      allOn.style.opacity = "1";
-      allOn.style.cursor = armed ? "pointer" : "not-allowed";
+    var offline = doc.body && doc.body.classList.contains("lights-offline");
+    function armBtn(btn) {
+      if (!btn) return;
+      btn.disabled = offline ? false : !armed;
+      btn.style.setProperty("pointer-events", "auto", "important");
+      btn.style.opacity = "1";
+      btn.style.cursor = "pointer";
     }
-    if (allOff) {
-      allOff.disabled = !armed;
-      allOff.style.pointerEvents = armed ? "auto" : "none";
-      allOff.style.opacity = "1";
-      allOff.style.cursor = armed ? "pointer" : "not-allowed";
-    }
+    armBtn(allOn);
+    armBtn(allOff);
     var grid = doc.getElementById("lights-pad-grid");
     if (grid) {
       var html = "";
@@ -730,9 +728,15 @@
         html +=
           '<article class="light-pad cmd-panel' + onCls + '" data-light-id="' + L.id + '">'
           + '<div class="light-pad-top">'
-          + '<div class="light-pad-ico" aria-hidden="true">💡</div>'
+          + '<div class="light-pad-ico" aria-hidden="true"><svg viewBox="0 0 32 32" width="64" height="64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 6a7 7 0 0 1 4 12c-1 1-1.5 2-1.5 4h-5c0-2-.5-3-1.5-4A7 7 0 0 1 16 6z"/><path d="M13 26h6"/></svg></div>'
           + '<div><div class="light-pad-name">' + escapeHtml(L.name) + "</div>"
-          + '<div class="light-pad-where">' + escapeHtml(L.where || L.kind) + "</div></div>"
+          + (function () {
+              var whereTxt = String(L.where || "").replace(/\s+/g, " ").trim();
+              var nameTxt = String(L.name || "").replace(/\s+/g, " ").trim();
+              if (!whereTxt || whereTxt.toLowerCase() === nameTxt.toLowerCase()) return "";
+              return '<div class="light-pad-where">' + escapeHtml(whereTxt) + "</div>";
+            })()
+          + "</div>"
           + '<div class="light-pad-state">' + (L.on ? "ON" : "OFF") + "</div>"
           + "</div>"
           + '<div class="light-pad-actions">'
@@ -802,15 +806,28 @@
     }
     var onB = doc.getElementById("lights-all-on");
     var offB = doc.getElementById("lights-all-off");
+    function offlineTap(ev) {
+      if (!doc.body || !doc.body.classList.contains("lights-offline")) return false;
+      if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+      var say = doc.getElementById("lights-offline-say");
+      if (say) {
+        say.textContent = "Lights are offline";
+        say.classList.add("is-on");
+        say.hidden = false;
+      }
+      return true;
+    }
     if (onB && !onB._lightsWired) {
       onB._lightsWired = true;
-      onB.addEventListener("click", function () {
+      onB.addEventListener("click", function (ev) {
+        if (offlineTap(ev)) return;
         tap(); setAll(true); paintPads(doc); paintHubPanel(doc); paintChip(doc.getElementById("index-lights-chip"));
       });
     }
     if (offB && !offB._lightsWired) {
       offB._lightsWired = true;
-      offB.addEventListener("click", function () {
+      offB.addEventListener("click", function (ev) {
+        if (offlineTap(ev)) return;
         tap(); setAll(false); paintPads(doc); paintHubPanel(doc); paintChip(doc.getElementById("index-lights-chip"));
       });
     }
@@ -961,6 +978,11 @@
     }
   }
   function hubPairStrip(doc, panel, grid) {
+    var onHub = /sheet-index\.html$/.test(((doc.defaultView || window).location.pathname) || "");
+    if (onHub) {
+      panel.removeAttribute("data-pair-need");
+      return false;
+    }
     var need = pairNeeded() && !canWrite();
     if (!need) {
       if (panel.hasAttribute("data-pair-need")) { panel.removeAttribute("data-pair-need"); hubPairHideBits(panel, false); }
@@ -979,13 +1001,14 @@
     doc = doc || document;
     var panel = doc.getElementById("hub-lights-panel");
     if (!panel) return;
-    /* Family hub: an unpaired lights board is theater. Dad recovery pages keep the pairing word. */
+    /* The wall does not paint the lights bar. The Lights launch button opens the sheet. */
     var paired = false;
     try { paired = !!(window.PrivateFeed && PrivateFeed.pairState && PrivateFeed.pairState() === "paired"); } catch (ePair) {}
-    if (/sheet-index\.html$/.test((doc.defaultView || window).location.pathname || "") && !paired) {
+    if (/sheet-index\.html$/.test((doc.defaultView || window).location.pathname || "")) {
       panel.hidden = true;
       return;
     }
+    void paired;
     panel.hidden = false;
     if (_dimDrag) return; /* don't wipe mid-drag fill */
     var deck = hubDeckLights();
@@ -1404,4 +1427,12 @@
     clampBright: clampBright,
     hubHonesty: hubHonesty
   };
+  try {
+    document.addEventListener("wardos:feed", function (ev) {
+      var d = ev.detail || {};
+      if (d.name !== "lights-live" || !d.data) return;
+      applyLivePayload(d.data);
+      paintHubPanel(document);
+    });
+  } catch (e) {}
 })(typeof window !== "undefined" ? window : globalThis);

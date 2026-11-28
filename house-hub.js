@@ -11,6 +11,9 @@
  * Box-only previews: a page served from 127.0.0.1/localhost may also use loopback http bases.
  * Allow-list entries: the two house origins (lights, cams) and two reserved .invalid QA origins (never resolve).
  */
+if (typeof document !== "undefined" && typeof document.write === "function" && document.readyState === "loading" && !window.HouseAudit) {
+  document.write('<script src="house-audit.js?v=AUDIT1"><\/script>');
+}
 (function (g) {
   "use strict";
   var PIN = ["684b83d4a06ec5bfc2f21c6cc7c6c5b2d42e31038122ad190189ec3364bb2b12", "4ccb5446788139f908a7bd69a43c15baeb367f9175d77d5cbc9483d97fb7743a", "88ce695bef4758aae88fb6aae5b33c1f4bc70d04f36f8bab9fe737a65ca6b227", "b0a9adae422eada33937aa0020ce234c1bdda31608995329990e8f00aba4a00f"];

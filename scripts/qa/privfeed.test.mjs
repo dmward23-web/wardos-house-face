@@ -234,7 +234,7 @@ test("FOLLOWUP2 static pages: an edited style block fails; plain description/rob
 });
 
 test("FOLLOWUP2 privacy-scan email: the one allowed address only as an exact whole match on privacy.html; encoded @ caught everywhere", async () => {
-  const { emailHit, decodeAt } = await import("../privacy-scan.mjs");
+  const { emailHit, decodeAt, scanText } = await import("../privacy-scan.mjs");
   const A = "atlasward" + "@" + "mail.grokbot.com";
   assert.equal(emailHit("privacy.html", A), false);
   assert.equal(emailHit("privacy.html", '<a href="mailto:' + A + '">' + A + "</a>"), false);
@@ -247,10 +247,26 @@ test("FOLLOWUP2 privacy-scan email: the one allowed address only as an exact who
   for (const sep of ["%" + "40", "%" + "40", "&#" + "64;", "&#" + "064;", "&#" + "x40;", "&" + "commat;"]) {
     assert.equal(emailHit("README.md", "bob" + sep + "example.org"), true, "encoded @ must hit: " + sep.length);
   }
+  const oldTok = ["x", ["example", "test"].join(".")].join("@");
+  assert.equal(emailHit("scripts/qa/acer-r42.test.mjs @" + "d4290224", 'email:"' + oldTok + '"'), false);
+  assert.equal(emailHit("scripts/qa/privfeed.test.mjs @" + "c9a1e223", 'email:"' + oldTok + '"'), false);
+  assert.equal(emailHit("scripts/qa/acer-r42.test.mjs", 'email:"' + oldTok + '"'), true);
+  assert.equal(emailHit("scripts/qa/injected.test.mjs", 'email:"' + oldTok + '"'), true);
   assert.equal(emailHit("README.md", "bob" + "%" + "40" + "EXAMPLE.org"), true);
   assert.equal(emailHit("privacy.html", A.replace("@", "%" + "40")), false, "the allowed address encoded on its own page stays allowed");
   assert.equal(emailHit("about.html", A.replace("@", "&#" + "64;")), true);
   assert.equal(decodeAt("a&" + "commat;b"), "a@b");
+});
+
+test("range mode catches a dated birthday in JSON when the label is path@commit", async () => {
+  const { scanText } = await import("../privacy-scan.mjs");
+  const line = '{"note":"' + "Pumpkin birthday party" + '"}\n';
+  const missed = [];
+  scanText("notes.json @" + "abcd1234", line, { pats: [] }, missed, "notes.json");
+  assert.ok(missed.some((h) => h.cat === "birthday_dated" && h.rel.indexOf("@") > 0), JSON.stringify(missed));
+  const allowed = [];
+  scanText("scripts/qa/fixtures/b.json @" + "abcd1234", line, { pats: [] }, allowed, "scripts/qa/fixtures/b.json");
+  assert.equal(allowed.length, 0, "a fixture path stays allowed: " + JSON.stringify(allowed));
 });
 
 test("gitignore keeps private files out", () => {

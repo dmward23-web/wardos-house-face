@@ -27,7 +27,9 @@ createRequire(import.meta.url)("../house-face-law.js");   /* sets globalThis.Hou
 const FACE_LAW = globalThis.HouseFaceLaw;
 import { spawnSync } from "node:child_process";
 import { ctMidnight } from "./ct-midnight.mjs"; /* DATA1 P1-5 · one all-day clock for both feeds */
-import { privPath, assertPrivateOut, namesRe, privateNames, externalEvents, EXT_ROLES } from "./private-dir.mjs"; /* PRIVFEED1 · EXTFILTER1 */
+import { privPath, assertPrivateOut, namesRe, privateNames, externalEvents, therapyDrop, EXT_ROLES } from "./private-dir.mjs"; /* PRIVFEED1 · EXTFILTER1 */
+createRequire(import.meta.url)("../house-event-display.js"); /* KID-FEED-SAFETY · same allowlist as the glass */
+const DISPLAY = globalThis.HouseEventDisplay;
 /* EXTNAMES1 · private-names.tsv role "external" names people outside the household (never in git). A kid's first name
    followed by one of them is not our kid, so it is cut out before the kid tests. ONLY "external" is filtered, plus the
    old key "otherfamily" during the transition (a later commit drops it). partner, coparent, household, school and every
@@ -254,9 +256,33 @@ function danWhat(it) {
   return `${KID_NAME[it.kid]} ${what}`;
 }
 
+function eventProbe(ev, summary) {
+  var probe = {};
+  if (ev && typeof ev === "object") {
+    Object.keys(ev).forEach(function (k) { probe[k] = ev[k]; });
+  }
+  probe.summary = summary;
+  probe.title = summary;
+  probe.what = summary;
+  if (ev && ev.eventType && !probe.eventType) probe.eventType = ev.eventType;
+  return probe;
+}
 function classify(ev) {
   const summary = summaryOf(ev);
+  const probe = eventProbe(ev, summary);
+  /* Classify the whole event before any field is dropped. A health word in any
+     field, with no show marker and no disguised boy name in the title, is not a row. */
+  if (DISPLAY && DISPLAY.isAppointment && DISPLAY.isAppointment(probe)) {
+    const view = DISPLAY.summarize ? DISPLAY.summarize(probe, "shared") : null;
+    if (view && view.title === "Appointment") return { kind: "appointment", summary: "Appointment", wardosShow: true };
+    /* A boy's appointment stays on Dad's week under its own name. Kid boards and the hub skip it. */
+  }
   if (!summary || isAdminNoise(summary)) return null;
+  /* KID-FEED-SAFETY · provider/therapy is denied before school/other classification. Opt-in is an explicit boolean, never a title. */
+  const boyHealth = /\b(?:hayes|harris)\b/i.test(summary) && /\b(?:dentist|doctors?|drs?|therap\w*|counsel\w*|psychiatr\w*|psycholog\w*|cus(?:tody)|legal|attorney|court|checkup|ortho)\b/i.test(summary);
+  if (therapyDrop(summary) || (DISPLAY && DISPLAY.isDenied(probe, "shared") && !boyHealth)) {
+    return null;
+  }
   if (/^Kids with Dan/i.test(summary)) return { kind: "custody", summary };
   if (/^Leave\s*·/i.test(summary) || /^Leave\b/i.test(summary)) {
     return { kind: "leave", summary, busy: !isFree(ev) };
@@ -289,7 +315,7 @@ function classify(ev) {
     if (kr && !RX(String.raw`§ (drop|pickup)`, "i").test(summary)) {
       return { kind: "leave", summary, busy: !isFree(ev), ride: true, kidRide: true, kid: kr[1].toLowerCase() };
     } }
-  if (/swim|Swim|Coach Ann/i.test(summary)) return { kind: "sport", sport: "swim", summary, kid: "ainsley" };
+  if (/swim|Swim/i.test(summary)) return { kind: "sport", sport: "swim", summary, kid: "ainsley" };
   if (/baseball|BASEBALL|Falcons/i.test(summary) && /hayes/i.test(summary)) {
     return { kind: "sport", sport: "baseball", summary, kid: "hayes" };
   }
@@ -400,6 +426,7 @@ function stripDollars(s) {
 }
 
 function kidsSafeWhat(summary, kind) {
+  if (DISPLAY && DISPLAY.CLINICAL.test(String(summary || ""))) return "";
   let s = summary
     .replace(/^Leave\s*·\s*/i, "")
     .replace(/^Ainsley\s*—\s*/i, "")
@@ -420,6 +447,7 @@ function kidsSafeWhat(summary, kind) {
   }
   // Drop trailing "· 3:00" / "· 5:00 practice" clock echo when strip already shows time
   s = s.replace(/\s*·\s*\d{1,2}:\d{2}(\s*(am|pm|a|p|practice|game))?\s*$/i, "").trim();
+  s = s.replace(/\b\d{1,2}(?::\d{2})?\s*(?:a\.?m\.?|p\.?m\.?)?\s*[-–—]\s*\d{1,2}(?::\d{2})?\s*(?:a\.?m\.?|p\.?m\.?)?/gi, " ").replace(/\s{2,}/g, " ").trim();
   s = s.replace(/\s*·\s*leave\s+\d{1,2}:\d{2}.*$/i, "").trim();
   return s;
 }
@@ -430,7 +458,8 @@ function buildBoardItems(events, now) {
   const items = [];
   for (const ev of events) {
     if (DRESS_RE.test(String(ev.summary || ""))) continue; /* LAW8C1 · colour days stay calendar markers (cal-live), never board rows */
-    if (FACE_LAW.isTherapy(String(ev.summary || ""))) continue; /* LIVEFIX1 · therapy never reaches a board */
+    const marked = DISPLAY && DISPLAY.keepAppointment && DISPLAY.keepAppointment(eventProbe(ev, summaryOf(ev)));
+    if (!marked && FACE_LAW.isTherapy(String(ev.summary || ""))) continue; /* LIVEFIX1 · therapy never reaches a board unless the show marker keeps it as Appointment */
     if (ev.status === "cancelled" || ev.status === "canceled") continue;
     /* CANCELGONE1 · title marked canceled = gone from board */
     if (/^\s*[\[(]?\s*(cancel+ed|cxl)\b/i.test(String(ev.summary || ""))) continue;
@@ -448,10 +477,12 @@ function buildBoardItems(events, now) {
       end,
       startIso: start.toISOString(),
       endIso: end.toISOString(),
-      location: ev.location || "",
+      location: cls.kind === "appointment" ? "" : (ev.location || ""),
       free: isFree(ev),
       raw: summaryOf(ev),
+      source: eventProbe(ev, summaryOf(ev)),
       allDay: isAllDay(ev),
+      wardosShow: cls.wardosShow === true
     });
   }
   items.sort((a, b) => a.start - b.start);
@@ -495,7 +526,7 @@ function pickStripQueue(items, now, homeWeek) {
      must NOT block kids/leaves. Past endIso already dropped by stillRelevant. */
   const leadMs = 10 * 60 * 1000;
   const upcoming = items
-    .filter((it) => stillRelevant(it, now) && it.kind !== "custody")
+    .filter((it) => stillRelevant(it, now) && it.kind !== "custody" && !boyWallHide(it))
     .filter((it) => it.kind !== "generic") // DATA1 P1-4 · household items live on Dad's week, never Next Up
     .filter((it) => it.kind !== "dad") // Dad chores stay on dan.today/week, not Next Up strip
     .filter((it) => !it.allDay) // ALLDAY1: Next Up is timed rows only; all-day notes live on the day lists as "All day"
@@ -610,6 +641,12 @@ function rowWhen(it, now) {
   return `${day} · ${whenTime(it)}`;
 }
 
+function boyWallHide(it) {
+  const s = String((it && (it.raw || it.summary)) || "");
+  if (!/\b(?:hayes|harris)\b/i.test(s)) return false;
+  return /\b(?:dentist|doctors?|drs?|therap\w*|counsel\w*|psychiatr\w*|psycholog\w*|custody|legal|attorney|court|checkup|ortho)\b/i.test(s);
+}
+
 function buildKidToday(kidId, items, now, homeWeek) {
   const todayIso = partsInTZ(now).iso;
   const rows = [];
@@ -623,21 +660,26 @@ function buildKidToday(kidId, items, now, homeWeek) {
       (kidId === "harris" && (it.kid === "harris" || kids.harris || isBoysRun(it, "harris")));
     if (!mine && it.kind !== "custody") continue;
     if (it.kind === "custody") continue;
+    if (boyWallHide(it)) continue;
     if (isAdminNoise(it.raw)) continue;
     let what = kidsSafeWhat(it.raw, it.kind);
+    if (!what) continue;
     let tone = "act";
     let kind = "event";
-    if (it.kind === "sport") { tone = "hot"; what = (kidId === "hayes" && /baseball/i.test(it.raw) ? "⚾ " : kidId === "harris" && /flag/i.test(it.raw) ? "🏁 " : kidId === "ainsley" && /swim/i.test(it.raw) ? "" : "") + what; }
-    if (it.kind === "appointment") tone = "hot";
+    if (it.kind === "sport" || it.kind === "appointment") tone = "hot";
     if (it.kind === "leave" && !isKidRide(it, kidId)) continue; // leaves are Dad strip / dan box, not kid glass (KIDRIDE1: own ride stays)
     if (isKidRide(it, kidId) && !rows.some((r) => r.ride)) { rows.unshift({ kind, when: rowWhen(it, now), what, hint: "", tone: "hot", ride: true }); continue; }
-    rows.push({
+    const row = {
       kind,
       when: rowWhen(it, now),
       what,
       hint: it.kind === "sport" ? "YOUR board" : "",
       tone,
-    });
+    };
+    row.summary = what;
+    row.title = what;
+    if (it.wardosShow === true && what === "Appointment") row.wardosShow = true;
+    rows.push(row);
   }
   /* DATA1 P2-11 · no custody note row on a kid's today (was "YOUR BASE with Dad" / "Kids away") */
   if (!rows.length) rows.push({ kind: "note", when: "Today", what: "Nothing else on the calendar today", hint: "", tone: "act" });
@@ -688,15 +730,17 @@ function buildKidSchool(kidId, items, now) {
 function buildKidAppointments(kidId, items, now) {
   const out = [];
   for (const it of items) {
-    if (it.kind !== "appointment") continue;
+    if (it.kind !== "appointment" || it.wardosShow !== true || boyWallHide(it)) continue;
     if (!stillRelevant(it, now)) continue;
     if (it.kid && it.kid !== kidId) continue;
     const row = {
       when: `${fmtDayLabel(it.start)} · ${whenTime(it)}`,
-      what: kidsSafeWhat(it.raw, "appointment"),
-      hint: "with Dad",
+      what: "Appointment",
+      summary: "Appointment",
+      hint: "",
       tone: "hot",
     };
+    if (it.wardosShow === true) row.wardosShow = true;
     if (it.herSpace) row.herSpace = true;
     out.push(row);
   }
@@ -709,7 +753,7 @@ function buildKidUpcoming(kidId, items, now) {
   const seen = new Set();
   for (const it of items) {
     if (!stillRelevant(it, now)) continue;
-    if (["custody", "dad", "generic"].includes(it.kind)) continue;
+    if (["custody", "dad", "generic"].includes(it.kind) || boyWallHide(it)) continue;
     if (it.kind === "leave" && !isKidRide(it, kidId)) continue;
     if (kidId === "ainsley" && (it.kind === "school_drop" || it.kind === "school_pickup")) continue;
     const kids = kidMentions(it.raw);
@@ -727,6 +771,7 @@ function buildKidUpcoming(kidId, items, now) {
 function hottestFor(kidId, items, now, homeWeek) {
   const upcoming = items.filter((it) => stillRelevant(it, now));
   const mine = upcoming.filter((it) => {
+    if (boyWallHide(it)) return false;
     if (isKidRide(it, kidId)) return true;
     if (it.kind === "leave" || it.kind === "dad" || it.kind === "custody") return false;
     if (it.kid === kidId) return true;
@@ -767,15 +812,21 @@ function buildDanToday(items, now, homeWeek) {
     // Dad box: leaves, school logistics, sports, appointments, notable dad
     if (!["leave", "school_drop", "school_pickup", "sport", "appointment", "school", "dad", "generic", "other"].includes(it.kind)) continue; /* DATA1 P1-4 */
     const when = `${partsInTZ(now).weekday.slice(0, 3)} · ${whenTime(it)}`;
-    const what = danWhat(it);
+    const view = DISPLAY && DISPLAY.summarize ? DISPLAY.summarize(Object.assign({}, it.source || {}, { summary: it.raw, title: it.raw, what: it.raw, wardosShow: it.wardosShow === true }), "shared") : null;
+    const what = view && view.title ? view.title : "";
+    if (!what) continue;
     const key = `${when}|${what}`.toLowerCase();
     if (seen.has(key)) continue;
     seen.add(key);
-    rows.push({
+    const dadRow = {
       when,
       what,
+      summary: what,
+      title: what,
       tone: it.kind === "leave" || it.kind === "sport" || it.kind === "appointment" || it.kind === "dad" ? "hot" : "act",
-    });
+    };
+    if (what === "Appointment" && it.wardosShow === true) dadRow.wardosShow = true;
+    rows.push(dadRow);
   }
   /* DATA1 P2-11 · no custody closing row (was "Kids with Dad at home through …") */
   if (!rows.length) rows.push({ when: partsInTZ(now).weekday.slice(0, 3), what: "Nothing else on the calendar today", tone: "act" });

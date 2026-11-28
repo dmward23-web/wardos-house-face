@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <script src="house-hub.js?v=HUBPAIR1"></script>
-<script src="private-feed.js?v=HUBPAIR1D"></script>
+<script src="private-feed.js?v=R53AR1"></script>
 <script src="house-face-law.js?v=FACESTRIP1"></script>
 <script src="house-pair.js?v=HUBPAIR1"></script>
 <script src="house-sound.js?v=MERGE1C"></script>
@@ -310,7 +310,7 @@
 <script>(function(){var h=document.documentElement;h.classList.add("ori-on");try{var sw=Math.min(screen.width||0,screen.height||0);if(sw&&sw<=600){h.classList.add("ori-phone");var v=document.querySelector('meta[name="viewport"]');if(v)v.setAttribute("content","width=device-width, initial-scale=1, viewport-fit=cover");}}catch(e){}})();</script>
 <link rel="stylesheet" href="house-ori.css?v=ORIHOME18" />
 <link rel="stylesheet" href="night/night-host.css?v=SUNHOME1" />
-<link rel="stylesheet" href="month-theme/month-overlay.css?v=SUNHOME2" />
+<link rel="stylesheet" href="month-theme/month-overlay.css?v=PASS2X1" />
 <style id="p1fix-dinner">
 /* P1FIX B54 · one compact picks card; every card sizes to its content (no 60% empty page) */
 html body .panel .body{flex:0 0 auto!important;align-content:start!important}
@@ -445,7 +445,8 @@ html body .suggest .hint,html body .suggest .lbl{color:rgba(255,255,255,.72)!imp
   function ctToday() {
     var iso;
     try {
-      iso = new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+      if (window.HouseClock && typeof HouseClock.iso === "function") iso = HouseClock.iso();
+      else iso = new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
     } catch (e) {
       var n = new Date();
       iso = n.getFullYear() + "-" + String(n.getMonth() + 1).padStart(2, "0") + "-" + String(n.getDate()).padStart(2, "0");
@@ -488,6 +489,7 @@ html body .suggest .hint,html body .suggest .lbl{color:rgba(255,255,255,.72)!imp
     }
     if (past) html = '<div class="day-row is-past earlier"><span class="pick">Earlier this week · ' + past + (past === 1 ? " night" : " nights") + "</span></div>" + html;
     list.innerHTML = html;
+    list.setAttribute("data-dinner-source", "fallback");
 
     var range = document.querySelector("[data-dinner-week-range]");
     if (range) range.textContent = "Sat " + label(sat) + " to Fri " + label(fri);
@@ -495,8 +497,61 @@ html body .suggest .hint,html body .suggest .lbl{color:rgba(255,255,255,.72)!imp
     if (end) end.textContent = "This week · through Fri " + label(fri);
   }
 
-  buildWeek();
-  setInterval(buildWeek, 60000); /* rolls at CT midnight without a reload */
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]; });
+  }
+  function weekCovers(start, iso) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(start || "")) return false;
+    var b = start.split("-");
+    var sat = utcDay(+b[0], +b[1], +b[2]);
+    if (sat.getUTCDay() !== 6) return false;
+    var fri = isoOf(new Date(sat.getTime() + 6 * 86400000));
+    return iso >= start && iso <= fri;
+  }
+  function renderJson(doc) {
+    var list = document.querySelector("[data-dinner-week]");
+    if (!list || !doc || doc.schema !== "wardos.dinner-week/1" || !Array.isArray(doc.rows)) return false;
+    var t = ctToday();
+    if (!weekCovers(doc.week_start, t.iso)) return false;
+    var html = "";
+    doc.rows.forEach(function (row) {
+      var budget = row.budget || {};
+      var amount = budget.flagged ? "" : esc(budget.amount || "");
+      var flag = budget.flagged ? esc(budget.text || budget.flag || "Flagged") : "";
+      var money = budget.flagged ? flag : amount;
+      html += '<div class="day-row" data-date="' + esc(row.date || "") + '">' +
+        '<span class="dow">' + esc(row.dow || "") + "</span>" +
+        '<span class="pick" data-dinner-meal>' + esc(row.meal || "") + "</span>" +
+        '<span class="tag" data-dinner-prep>' + esc(row.prep || "") + "</span>" +
+        '<span class="tag" data-dinner-kid>' + esc(row.kid || "") + "</span>" +
+        '<span class="tag" data-dinner-budget>' + money + "</span></div>";
+    });
+    var stores = Array.isArray(doc.stores) ? doc.stores : [];
+    if (stores.length) {
+      html += '<div class="day-row" data-dinner-stores>';
+      stores.forEach(function (s) {
+        html += '<span class="tag" data-store-total="' + esc(s.total || "") + '">' + esc(s.name || "") + " " + esc(s.total || "") + "</span>";
+      });
+      html += "</div>";
+    }
+    if (!html) return false;
+    list.innerHTML = html;
+    list.setAttribute("data-dinner-source", "json");
+    lastIso = t.iso;
+    return true;
+  }
+  function loadDinner() {
+    var url = "data/dinner-week.json";
+    if (typeof fetch !== "function") { buildWeek(); return; }
+    fetch(url, { cache: "no-store" }).then(function (r) {
+      if (!r.ok) throw new Error("status");
+      return r.json();
+    }).then(function (doc) {
+      if (!renderJson(doc)) buildWeek();
+    }).catch(function () { buildWeek(); });
+  }
+  loadDinner();
+  setInterval(function () { lastIso = null; loadDinner(); }, 60000);
 })();
 </script>
 <script src="house-zoom.js"></script>
@@ -506,6 +561,6 @@ html body .suggest .hint,html body .suggest .lbl{color:rgba(255,255,255,.72)!imp
 <script src="ori/ori-scene.js?v=ORIHOME18"></script>
 <script src="house-ori-world.js?v=MERGE1C"></script>
 <script src="night/night-host.js?v=BGONCE1" defer></script>
-<script src="month-theme/season-math.js?v=SUNHOME1" defer></script><script src="month-theme/month-overlay.js?v=SUNHOME2" defer></script>
+<script src="month-theme/season-math.js?v=SUNHOME1" defer></script><script src="month-theme/month-overlay.js?v=PASS2X1" defer></script>
 </body>
 </html>

@@ -1,0 +1,698 @@
+{
+ "asOf": "Fri Dec 4 2026",
+ "asOfIso": "2026-12-04",
+ "refreshedAt": "2026-12-04T13:30:00.000Z",
+ "sourceCalendar": "primary",
+ "leaveBys": {
+  "QXS_drop": "Sample QXS_drop 103",
+  "QXS_pickup": "Sample QXS_pickup 104",
+  "note": "Sample note 105"
+ },
+ "homeWeek": {
+  "with": "Dad",
+  "place": "Home",
+  "through": "2026-12-11",
+  "throughLabel": "through Fri Dec 11"
+ },
+ "boardStrip": {
+  "label": "Next up \u00b7 today",
+  "time": "3:00 PM",
+  "place": "School pickup",
+  "detailHtml": "",
+  "badge": "Fri",
+  "startIso": "2026-12-04T21:00:00.000Z",
+  "endIso": "2026-12-04T21:30:00.000Z",
+  "kind": "pickup",
+  "nextLeave": null,
+  "queue": []
+ },
+ "kids": {
+  "harris": {
+   "id": "harris",
+   "name": "Harris",
+   "you": "you",
+   "theme": "block-world",
+   "themeLabel": "Sample themeLabel 151",
+   "gradeVoice": "Sample gradeVoice 152",
+   "avatar": "Sample avatar 153",
+   "currency": {
+    "unit": "gem",
+    "plural": "gems",
+    "symbol": "Sample symbol 154",
+    "label": "Sample label 155"
+   },
+   "bankGoal": {
+    "id": "gem-jar",
+    "title": "Sample title 156",
+    "blurb": "Sample blurb 157",
+    "need": 4,
+    "reward": "Sample reward 158",
+    "dollarNeed": 4,
+    "weeklyAllowance": 4,
+    "starDollar": 2
+   },
+   "quests": [
+    {
+     "id": "har-bed",
+     "what": "Sample what 159",
+     "stars": 1,
+     "cadence": "daily"
+    },
+    {
+     "id": "har-backpack",
+     "what": "Sample what 160",
+     "stars": 1,
+     "cadence": "daily"
+    },
+    {
+     "id": "har-dishes",
+     "what": "Sample what 161",
+     "stars": 1,
+     "cadence": "daily"
+    },
+    {
+     "id": "har-empty",
+     "what": "Sample what 162",
+     "stars": 1,
+     "cadence": "daily"
+    },
+    {
+     "id": "har-trash",
+     "what": "Sample what 163",
+     "stars": 1,
+     "cadence": "daily"
+    },
+    {
+     "id": "har-postgame",
+     "what": "Sample what 164",
+     "stars": 1,
+     "cadence": "daily"
+    },
+    {
+     "id": "har-shower",
+     "what": "Sample what 165",
+     "stars": 1,
+     "cadence": "daily"
+    },
+    {
+     "id": "har-toys",
+     "what": "Sample what 166",
+     "stars": 2,
+     "cadence": "weekly"
+    },
+    {
+     "id": "har-shoes",
+     "what": "Sample what 167",
+     "stars": 1,
+     "cadence": "weekly"
+    },
+    {
+     "id": "har-cubby",
+     "what": "Sample what 168",
+     "stars": 1,
+     "cadence": "weekly"
+    }
+   ],
+   "fun": [
+    {
+     "when": "Sample when 169",
+     "what": "Sample what 170",
+     "hint": "Sample hint 171",
+     "tone": "fun"
+    },
+    {
+     "when": "Sample when 172",
+     "what": "Sample what 173",
+     "hint": "Sample hint 174",
+     "tone": "fun"
+    },
+    {
+     "when": "Sample when 175",
+     "what": "Sample what 176",
+     "hint": "Sample hint 177",
+     "tone": "fun"
+    },
+    {
+     "when": "Sample when 178",
+     "what": "Sample what 179",
+     "hint": "Sample hint 180",
+     "tone": "fun"
+    }
+   ],
+   "streakLabel": "Sample streakLabel 181",
+   "missions": [
+    {
+     "when": "Sample when 182",
+     "what": "Sample what 183",
+     "hint": "Sample hint 184",
+     "tone": "fun"
+    },
+    {
+     "when": "Sample when 185",
+     "what": "Sample what 186",
+     "hint": "Sample hint 187",
+     "tone": "fun"
+    }
+   ],
+   "appointmentsEmpty": "Sample appointmentsEmpty 188",
+   "hottest": {
+    "when": "TUE",
+    "what": "NOTHING NEXT ON THE CALENDAR",
+    "where": "",
+    "badges": [
+     "TUE"
+    ]
+   },
+   "today": [
+    {
+     "kind": "event",
+     "when": "Today \u00b7 3:00 PM",
+     "what": "School pickup",
+     "hint": "Dad",
+     "tone": "act"
+    },
+    {
+     "kind": "must",
+     "when": "Today \u00b7 7:00 AM",
+     "what": "Brush teeth",
+     "hint": "",
+     "tone": "act"
+    },
+    {
+     "kind": "must",
+     "when": "Today \u00b7 7:15 AM",
+     "what": "Backpack by the door",
+     "hint": "",
+     "tone": "act"
+    },
+    {
+     "kind": "must",
+     "when": "Today \u00b7 7:30 AM",
+     "what": "Spelling list",
+     "hint": "",
+     "tone": "act"
+    },
+    {
+     "kind": "must",
+     "when": "Today \u00b7 3:30 PM",
+     "what": "Make bed",
+     "hint": "",
+     "tone": "act"
+    },
+    {
+     "kind": "must",
+     "when": "Today \u00b7 5:00 PM",
+     "what": "Clothes in hamper",
+     "hint": "",
+     "tone": "act"
+    },
+    {
+     "kind": "must",
+     "when": "Today \u00b7 7:30 PM",
+     "what": "Water bottle filled",
+     "hint": "",
+     "tone": "act"
+    }
+   ],
+   "sports": [],
+   "school": [],
+   "appointments": [],
+   "upcoming": []
+  },
+  "hayes": {
+   "id": "hayes",
+   "name": "Hayes",
+   "you": "you",
+   "theme": "drop-zone",
+   "themeLabel": "Sample themeLabel 218",
+   "gradeVoice": "Sample gradeVoice 219",
+   "avatar": "Sample avatar 220",
+   "currency": {
+    "unit": "coin",
+    "plural": "coins",
+    "symbol": "Sample symbol 221",
+    "label": "Sample label 222"
+   },
+   "bankGoal": {
+    "id": "victory-jar",
+    "title": "Sample title 223",
+    "blurb": "Sample blurb 224",
+    "need": 6,
+    "reward": "Sample reward 225",
+    "dollarNeed": 6,
+    "weeklyAllowance": 6,
+    "starDollar": 2
+   },
+   "quests": [
+    {
+     "id": "hay-bed",
+     "what": "Sample what 226",
+     "stars": 1,
+     "cadence": "daily"
+    },
+    {
+     "id": "hay-backpack",
+     "what": "Sample what 227",
+     "stars": 1,
+     "cadence": "daily"
+    },
+    {
+     "id": "hay-dishes",
+     "what": "Sample what 228",
+     "stars": 1,
+     "cadence": "daily"
+    },
+    {
+     "id": "hay-empty",
+     "what": "Sample what 229",
+     "stars": 1,
+     "cadence": "daily"
+    },
+    {
+     "id": "hay-trash",
+     "what": "Sample what 230",
+     "stars": 1,
+     "cadence": "daily"
+    },
+    {
+     "id": "hay-postgame",
+     "what": "Sample what 231",
+     "stars": 1,
+     "cadence": "daily"
+    },
+    {
+     "id": "hay-shower",
+     "what": "Sample what 232",
+     "stars": 1,
+     "cadence": "daily"
+    },
+    {
+     "id": "hay-room",
+     "what": "Sample what 233",
+     "stars": 2,
+     "cadence": "weekly"
+    },
+    {
+     "id": "hay-shoes",
+     "what": "Sample what 234",
+     "stars": 1,
+     "cadence": "weekly"
+    },
+    {
+     "id": "hay-cubby",
+     "what": "Sample what 235",
+     "stars": 1,
+     "cadence": "weekly"
+    }
+   ],
+   "fun": [
+    {
+     "when": "Sample when 236",
+     "what": "Sample what 237",
+     "hint": "Sample hint 238",
+     "tone": "fun"
+    },
+    {
+     "when": "Sample when 239",
+     "what": "Sample what 240",
+     "hint": "Sample hint 241",
+     "tone": "fun"
+    },
+    {
+     "when": "Sample when 242",
+     "what": "Sample what 243",
+     "hint": "Sample hint 244",
+     "tone": "fun"
+    },
+    {
+     "when": "Sample when 245",
+     "what": "Sample what 246",
+     "hint": "Sample hint 247",
+     "tone": "fun"
+    }
+   ],
+   "streakLabel": "Sample streakLabel 248",
+   "missions": [
+    {
+     "when": "Sample when 249",
+     "what": "Sample what 250",
+     "hint": "Sample hint 251",
+     "tone": "fun"
+    },
+    {
+     "when": "Sample when 252",
+     "what": "Sample what 253",
+     "hint": "Sample hint 254",
+     "tone": "fun"
+    }
+   ],
+   "appointmentsEmpty": "Sample appointmentsEmpty 255",
+   "hottest": {
+    "when": "TUE \u00b7 All day",
+    "what": "COSTUME PARADE",
+    "where": "Tue 17",
+    "badges": [
+     "TUE",
+     "All day"
+    ]
+   },
+   "today": [
+    {
+     "kind": "event",
+     "when": "Today \u00b7 3:00 PM",
+     "what": "School pickup",
+     "hint": "Dad",
+     "tone": "act"
+    },
+    {
+     "kind": "must",
+     "when": "Today \u00b7 7:00 AM",
+     "what": "Brush teeth",
+     "hint": "",
+     "tone": "act"
+    },
+    {
+     "kind": "must",
+     "when": "Today \u00b7 7:15 AM",
+     "what": "Backpack by the door",
+     "hint": "",
+     "tone": "act"
+    },
+    {
+     "kind": "must",
+     "when": "Today \u00b7 7:30 AM",
+     "what": "Reading 20 min",
+     "hint": "",
+     "tone": "act"
+    },
+    {
+     "kind": "must",
+     "when": "Today \u00b7 3:30 PM",
+     "what": "Feed the fish",
+     "hint": "",
+     "tone": "act"
+    },
+    {
+     "kind": "must",
+     "when": "Today \u00b7 5:00 PM",
+     "what": "Make bed",
+     "hint": "",
+     "tone": "act"
+    },
+    {
+     "kind": "must",
+     "when": "Today \u00b7 7:30 PM",
+     "what": "Shoes on the rack",
+     "hint": "",
+     "tone": "act"
+    },
+    {
+     "kind": "must",
+     "when": "Today \u00b7 8:00 PM",
+     "what": "Lunchbox in sink",
+     "hint": "",
+     "tone": "act"
+    }
+   ],
+   "sports": [],
+   "school": [
+    {
+     "when": "Tue 17 \u00b7 All day",
+     "what": "costume parade",
+     "tone": "act",
+     "hint": ""
+    }
+   ],
+   "appointments": [],
+   "upcoming": [
+    {
+     "when": "Tue 17 \u00b7 All day",
+     "what": "costume parade",
+     "tone": "act"
+    }
+   ]
+  },
+  "ainsley": {
+   "id": "ainsley",
+   "name": "Ainsley",
+   "you": "you",
+   "theme": "vinyl-night",
+   "themeLabel": "Ainsley",
+   "gradeVoice": "Sample gradeVoice 285",
+   "avatar": "Sample avatar 286",
+   "quests": [
+    {
+     "id": "ain-bed",
+     "what": "Sample what",
+     "cadence": "daily"
+    },
+    {
+     "id": "ain-toys",
+     "what": "Sample what",
+     "cadence": "daily"
+    },
+    {
+     "id": "ain-dishwasher",
+     "what": "Sample what",
+     "cadence": "daily"
+    },
+    {
+     "id": "ain-empty",
+     "what": "Sample what",
+     "cadence": "daily"
+    },
+    {
+     "id": "ain-living",
+     "what": "Sample what",
+     "cadence": "daily"
+    },
+    {
+     "id": "ain-bath",
+     "what": "Sample what",
+     "cadence": "weekly"
+    },
+    {
+     "id": "ain-laundry",
+     "what": "Sample what",
+     "cadence": "weekly"
+    },
+    {
+     "id": "ain-cubby",
+     "what": "Sample what",
+     "cadence": "weekly"
+    },
+    {
+     "id": "ain-babysit",
+     "what": "Sample what",
+     "cadence": "addon",
+     "optional": true,
+     "hire": true,
+     "hint": "Sample hint"
+    }
+   ],
+   "fun": [],
+   "missions": [
+    {
+     "when": "Sample when",
+     "what": "Sample what",
+     "hint": "Sample hint",
+     "tone": "fun"
+    },
+    {
+     "when": "Sample when",
+     "what": "Sample what",
+     "hint": "Sample hint",
+     "tone": "fun"
+    }
+   ],
+   "goal": {
+    "name": "Sample name",
+    "need": 20,
+    "placeholder": "Sample placeholder"
+   },
+   "bag": {
+    "place": "Sample place",
+    "label": "Sample label",
+    "hint": "Pack the night before"
+   },
+   "rides": [
+    {
+     "id": "scooter",
+     "what": "Sample what",
+     "when": "Sample when",
+     "clear": true
+    },
+    {
+     "id": "bv-rec",
+     "what": "Sample what",
+     "when": "Sample when",
+     "clear": true
+    },
+    {
+     "id": "swim",
+     "what": "Sample what",
+     "when": "Sample when",
+     "clear": true,
+     "hours": "Sample hours"
+    }
+   ],
+   "appointmentsEmpty": "Sample appointmentsEmpty 322",
+   "sportsEmpty": "",
+   "hottest": {
+    "when": "TUE",
+    "what": "NOTHING NEXT ON THE CALENDAR",
+    "where": "",
+    "badges": [
+     "TUE"
+    ]
+   },
+   "today": [
+    {
+     "kind": "event",
+     "when": "Today \u00b7 3:00 PM",
+     "what": "School pickup",
+     "hint": "Dad",
+     "tone": "act"
+    },
+    {
+     "kind": "must",
+     "when": "Today \u00b7 7:00 AM",
+     "what": "Brush teeth",
+     "hint": "",
+     "tone": "act"
+    },
+    {
+     "kind": "must",
+     "when": "Today \u00b7 7:15 AM",
+     "what": "Pack bag for tomorrow",
+     "hint": "",
+     "tone": "act"
+    },
+    {
+     "kind": "must",
+     "when": "Today \u00b7 7:30 AM",
+     "what": "Practice piano 15 min",
+     "hint": "",
+     "tone": "act"
+    },
+    {
+     "kind": "must",
+     "when": "Today \u00b7 3:30 PM",
+     "what": "Make bed",
+     "hint": "",
+     "tone": "act"
+    },
+    {
+     "kind": "must",
+     "when": "Today \u00b7 5:00 PM",
+     "what": "Dishes to sink",
+     "hint": "",
+     "tone": "act"
+    }
+   ],
+   "sports": [],
+   "school": [],
+   "appointments": [],
+   "upcoming": []
+  },
+  "dan": {
+   "id": "dan",
+   "name": "Sample name 339",
+   "theme": "house-dad",
+   "themeLabel": "Sample themeLabel 340",
+   "avatar": "Sample avatar 341",
+   "note": "Sample note 342",
+   "picks": [
+    {
+     "when": "Sample when 343",
+     "what": "Sample what 344",
+     "hint": "Sample hint 345",
+     "tone": "fun"
+    },
+    {
+     "when": "Sample when 346",
+     "what": "Sample what 347",
+     "hint": "Sample hint 348",
+     "tone": "fun"
+    }
+   ],
+   "leaveBys": [
+    {
+     "when": "Sample when 349",
+     "what": "Sample what 350",
+     "tone": "act"
+    },
+    {
+     "when": "Sample when 351",
+     "what": "Sample what 352",
+     "tone": "act"
+    },
+    {
+     "when": "Sample when 353",
+     "what": "Sample what 354",
+     "tone": "act"
+    },
+    {
+     "when": "Sample when 355",
+     "what": "Sample what 356",
+     "tone": "act"
+    }
+   ],
+   "hottest": {
+    "when": "Tue Nov 17 2026",
+    "what": "Nothing next on the calendar",
+    "where": "",
+    "badges": []
+   },
+   "today": [
+    {
+     "when": "Fri \u00b7 7:45 AM",
+     "what": "School drop-off",
+     "tone": "act"
+    },
+    {
+     "when": "Fri \u00b7 3:00 PM",
+     "what": "School pickup",
+     "tone": "act"
+    },
+    {
+     "when": "Fri \u00b7 5:30 PM",
+     "what": "Pizza and movie night",
+     "tone": "act"
+    },
+    {
+     "when": "Fri \u00b7 7:00 PM",
+     "what": "Hang the stockings",
+     "tone": "act"
+    }
+   ],
+   "week": [
+    {
+     "when": "Sat 5 \u00b7 10:00",
+     "what": "Tree farm trip",
+     "tone": "act"
+    },
+    {
+     "when": "Sun 6 \u00b7 2:00",
+     "what": "Cookie baking",
+     "tone": "act"
+    },
+    {
+     "when": "Mon 7 \u00b7 3:00",
+     "what": "School pickup",
+     "tone": "act"
+    },
+    {
+     "when": "Tue 8 \u00b7 6:00",
+     "what": "Skate night",
+     "tone": "act"
+    },
+    {
+     "when": "Wed 9 \u00b7 3:00",
+     "what": "School pickup",
+     "tone": "act"
+    }
+   ]
+  }
+ }
+}

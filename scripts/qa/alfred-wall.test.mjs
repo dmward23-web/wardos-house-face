@@ -29,10 +29,12 @@ test("hub doors take real clicks at the four tile centers and home returns", SKI
   const r = await run("doors");
   for (const door of r.doors) {
     assert.ok(door.hit.door, JSON.stringify(door));
+    if (door.kind === "center") assert.doesNotMatch(door.hit.cls || "", /roster-plate/, JSON.stringify(door));
     assert.equal(door.hit.panel, false, JSON.stringify(door.hit));
     assert.ok(door.url.includes(door.dest), JSON.stringify(door));
     assert.equal(door.money, false, JSON.stringify(door));
     assert.ok(door.home && door.home.includes("sheet-index.html"), JSON.stringify(door));
+    assert.ok(typeof door.armedMs === "number" && door.armedMs <= 1000, "Home was not the hit target within 1 s of load " + JSON.stringify(door));
   }
 });
 
@@ -82,7 +84,8 @@ test("wall taps do not scale cards, shrink gaps, or move the jar", SKIP, async (
 test("chores header card keeps every line inside the card and clear of other text", SKIP, async () => {
   const r = await run("cheer");
   const c = r.cheer;
-  assert.ok(c.texts.length >= 4, JSON.stringify(c));
+  /* Prism D8: the header card is one line, "Tap your day when it's done", plus the date. */
+  assert.ok(c.texts.length >= 2, JSON.stringify(c));
   assert.deepEqual(c.outside, [], JSON.stringify(c));
   assert.deepEqual(c.overlaps, [], JSON.stringify(c));
   assert.ok(c.card.b <= 1032 && c.card.t >= 48 && c.card.r <= 1872, JSON.stringify(c.card));

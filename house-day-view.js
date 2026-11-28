@@ -24,18 +24,35 @@
     var panel = document.querySelector(".panel");
     if (!panel) return;
     var st = document.createElement("style");
-    st.textContent = "html.day-view-on .panel > .gm, html.day-view-on .panel > .wx-card, html.day-view-on .panel > .body, html.day-view-on .panel > .leaveby, html.day-view-on .panel .leaveby, html.day-view-on .panel > .ftr { display: none !important; }";
+    st.textContent = "html.day-view-on .panel > *:not(header):not(.day-view){display:none!important} html.day-view-on:not(#hf-wall-off) body .panel>.body,html.day-view-on body .panel .kids-col,html.day-view-on body .panel .today-day,html.day-view-on body .panel .where-card,html.day-view-on body .panel nav.tap-rail{display:none!important} html.day-view-on .panel>section.day-view{display:flex!important;position:fixed!important;left:160px!important;top:160px!important;right:48px!important;bottom:48px!important;z-index:2!important;margin:0!important;padding:16px 24px!important;width:auto!important;box-sizing:border-box!important;background:#101820!important;color:#f4efe6!important} html.day-view-on .dv-nav{min-width:64px!important;min-height:64px!important;font-size:32px!important}";
     document.head.appendChild(st); document.documentElement.classList.add("day-view-on");
+    document.querySelectorAll(".panel .body, .panel .kids-col, .panel .today-day, .panel nav.tap-rail, .panel .quick, .panel .where-card, .panel .kid-card").forEach(function (el) {
+      el.style.setProperty("display", "none", "important");
+    });
     var chip = document.querySelector("[data-sheet-chip]"); if (chip) chip.textContent = "Day";
     var day = months && months.days && months.days[iso];
     var rows = [];
     var timed = ((live && live.upcomingLeaves) || []).filter(function (x) { return x && x.start && x.start.slice(0, 10) === iso && !x.allDay; });
     var law = typeof window !== "undefined" && window.HouseFaceLaw; /* LIVELAW1 · colour / dress-up days are never rows */
     if (law) timed = timed.filter(function (x) { return !law.isDressDay(x.summary); });
-    timed.forEach(function (x) { rows.push({ t: hm(x.start), l: clean(x.summary), w: clean((x.location || "").split(",")[0]) }); });
+    function labelOf(ev, text) {
+      var D = window.HouseEventDisplay;
+      if (D && typeof D.summarize === "function") {
+        var row = ev && typeof ev === "object" ? Object.assign({}, ev) : {};
+        row.summary = text; row.title = text; row.what = text;
+        var view = D.summarize(row, "shared");
+        return view && view.title ? view.title : "";
+      }
+      return clean(text);
+    }
+    timed.forEach(function (x) {
+      var l = labelOf(x, x.summary);
+      if (!l) return;
+      rows.push({ t: hm(x.start), l: l, w: "" });
+    });
     var seen = rows.map(function (r) { return r.l.toLowerCase().slice(0, 18); });
     ((day && day.items) || []).forEach(function (it) {
-      var l = clean(it.l); if (!l || (law && law.isDressDay(l))) return;
+      var l = labelOf(it, it.l); if (!l || (law && law.isDressDay(l))) return;
       if (seen.indexOf(l.toLowerCase().slice(0, 18)) >= 0) return;
       rows.push({ t: "", l: l, w: "", c: it.c });
     });
@@ -43,10 +60,10 @@
     sec.className = "sec day-view"; sec.setAttribute("data-day-view", iso); sec.setAttribute("aria-label", nice);
     sec.style.cssText = "margin:12px 0;display:flex;flex-direction:column;gap:10px";
     var html = '<div class="sec-hdr" style="display:flex;align-items:center;justify-content:space-between;gap:8px">' +
-      '<a class="dv-nav" data-dv="prev" href="sheet-today.html?d=' + shift(iso, -1) + '" aria-label="Previous day" style="min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;font-size:22px;text-decoration:none;color:inherit">‹</a>' +
+      '<a class="dv-nav" data-dv="prev" href="sheet-today.html?d=' + shift(iso, -1) + '" aria-label="Previous day" style="min-width:64px;min-height:64px;display:flex;align-items:center;justify-content:center;font-size:32px;text-decoration:none;color:inherit">‹</a>' +
       '<div style="text-align:center"><div class="sec-title" style="font-size:22px">' + esc(nice) + '</div>' +
       '<div class="sec-meta">' + "" + '</div></div>' +
-      '<a class="dv-nav" data-dv="next" href="sheet-today.html?d=' + shift(iso, 1) + '" aria-label="Next day" style="min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;font-size:22px;text-decoration:none;color:inherit">›</a></div>';
+      '<a class="dv-nav" data-dv="next" href="sheet-today.html?d=' + shift(iso, 1) + '" aria-label="Next day" style="min-width:64px;min-height:64px;display:flex;align-items:center;justify-content:center;font-size:32px;text-decoration:none;color:inherit">›</a></div>';
     if (!rows.length) html += '<div style="padding:16px;opacity:.75">Nothing on the calendar.</div>';
     rows.forEach(function (r) {
       html += '<div class="dv-row" style="display:flex;gap:12px;align-items:baseline;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.06)">' +

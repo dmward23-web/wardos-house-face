@@ -29,7 +29,24 @@
      4s and the held motion resumes, so the board is never left behind a blank veil. */
   var RMQ = typeof matchMedia === "function" ? matchMedia("(prefers-reduced-motion: reduce)") : null, DROP_MS = 4000;
   function leave(href) { location.href = href; setTimeout(clear, DROP_MS); }
-  function clear() { document.querySelectorAll(".ori-iris[data-calm]").forEach(function (el) { el.remove(); }); held.splice(0).forEach(function (an) { try { an.play(); } catch (e) {} }); }
+  function clear() {
+    /* A restored page still has the leave iris. Hold it long enough for the return read, then fade it off. */
+    document.querySelectorAll(".ori-iris[data-calm]").forEach(function (el) {
+      if (el.getAttribute("data-calm-fade") === "1") return;
+      el.setAttribute("data-calm-fade", "1");
+      var start = 0;
+      function step(now) {
+        if (!start) start = now;
+        var t = now - start;
+        var op = t < 220 ? 1 : Math.max(0, 1 - (t - 220) / 420);
+        el.style.opacity = String(op);
+        if (op > 0.001) requestAnimationFrame(step);
+        else el.remove();
+      }
+      requestAnimationFrame(step);
+    });
+    held.splice(0).forEach(function (an) { try { an.play(); } catch (e) {} });
+  }
   addEventListener("pageshow", clear);
   document.addEventListener("click", function (ev) {
     if (ev.defaultPrevented || ev.button || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
@@ -39,20 +56,39 @@
     if (u.origin !== location.origin || !/\.html$/.test(u.pathname) || u.pathname === location.pathname) return;
     ev.preventDefault();
     try { sessionStorage.setItem("ori-veil-next", String(Date.now())); } catch (e) {}
+    /* The camera row's tap budget is 300ms. The veil hold below is for the other boards. */
+    if (a.classList.contains("hub-cam")) { leave(u.href); return; }
     var el = document.createElement("div");
     el.className = "ori-iris";
     el.setAttribute("data-calm", "1");
     el.setAttribute("aria-hidden", "true");
-    el.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:#062018;opacity:0;pointer-events:none;transition:opacity .2s ease";
+    el.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:#062018;opacity:1;pointer-events:none";
+    /* .ori-iris fades in from 0 over 420ms. That animation overrides this inline
+       opacity, and on a stalled thread it finishes on the compositor before any
+       sample. The calm veil is already opaque; it does not use that fade. */
+    el.style.setProperty("animation", "none", "important");
     try { document.getAnimations().forEach(function (an) { if (an.playState === "running") { an.pause(); held.push(an); } }); } catch (e) {}
     root.appendChild(el);
     void getComputedStyle(el).opacity;
     el.style.opacity = "1";
     if (root.classList.contains("ori-reduced") || (RMQ && RMQ.matches)) { setTimeout(function () { leave(u.href); }, 0); return; }
-    /* VEILPAUSE1 · leave on the frame after the veil was drawn at opacity >= .9 (and >= 320ms), never later than 1.5s. */
-    var t0 = Date.now(), gone = false, shown = false;
+    /* Opacity is set, not transitioned, so a paused animation cannot pin it at 0.
+       The 320ms starts at the first opaque frame. Counting from the click let a
+       stalled thread spend the hold before the iris was readable, then leave on
+       the next frame. Leave on the frame after it has been painted at >= .9 for
+       320ms, and never later than 1.5s. */
+    var t0 = Date.now(), gone = false, shown = false, hold = 0;
     function go() { if (gone) return; gone = true; leave(u.href); }
-    function tick() { if (gone) return; if (shown) return go(); if (Date.now() - t0 >= 320 && (parseFloat(getComputedStyle(el).opacity) || 0) >= 0.9) shown = true; requestAnimationFrame(tick); }
+    function tick() {
+      if (gone) return;
+      /* Until the iris is actually opaque, keep the clock at this frame so a
+         stall cannot satisfy the 320ms before a readable paint. */
+      if (!hold) {
+        t0 = Date.now();
+        if ((parseFloat(getComputedStyle(el).opacity) || 0) >= 0.9) hold = 1;
+      }
+      if (shown) return go(); if (Date.now() - t0 >= 320 && (parseFloat(getComputedStyle(el).opacity) || 0) >= 0.9) shown = true; requestAnimationFrame(tick);
+    }
     requestAnimationFrame(tick);
     setTimeout(go, 1500);
   }, false);
