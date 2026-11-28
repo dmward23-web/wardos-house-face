@@ -100,6 +100,13 @@ test("TODAYSLAB1 Today titles sit on the row chip and +N more lines up with the 
   assert.match(slab.titleBg, /^rgba\(0,\s*0,\s*0,\s*0\)$/, "title background is not transparent " + slab.titleBg);
   const ratio = contrast(slab.ink, slab.chip);
   assert.ok(ratio >= 4.5, "title-to-row-chip contrast " + ratio.toFixed(2) + " " + JSON.stringify({ ink: slab.ink, chip: slab.chip }));
+  assert.ok(Array.isArray(slab.rows) && slab.rows.length >= 2, "TODAYSLAB1 visible rows " + (slab.rows ? slab.rows.length : 0));
+  for (let i = 0; i < slab.rows.length; i++) {
+    const row = slab.rows[i];
+    assert.ok(row && row.ink && row.chip, "row " + i + " missing ink or chip " + JSON.stringify(row));
+    const rowRatio = contrast(row.ink, row.chip);
+    assert.ok(rowRatio >= 4.5, "row " + i + " title-to-row-chip contrast " + rowRatio.toFixed(2) + " " + JSON.stringify({ ink: row.ink, chip: row.chip, isNext: row.isNext }));
+  }
   assert.ok(Math.abs(slab.moreX - slab.timeX) <= 2, "+N more is off the row text " + JSON.stringify({ moreX: slab.moreX, timeX: slab.timeX, rowX: slab.rowX }));
 });
 

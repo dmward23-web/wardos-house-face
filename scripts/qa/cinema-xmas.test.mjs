@@ -799,7 +799,7 @@ test("browser: cinema wall keeps every control, stays graded off the cards, and 
       console.log("classic run " + run + " exact " + delta.exact + " tolerated " + delta.tolerated + " over " + delta.over);
       console.log("classic-compare over " + delta.over + " tolerated " + delta.tolerated);
       assert.equal(delta.over, 0, "classic wall render differs from base, run " + run + " over " + delta.over);
-      assert.ok(delta.tolerated <= 1000, "one-level shift too wide, run " + run + " tolerated " + delta.tolerated);
+      assert.equal(delta.tolerated, 0, "one-level shift too wide, run " + run + " tolerated " + delta.tolerated);
       assert.ok(delta.over < 800, "the mark phase delta grew past the logo, run " + run);
     }
     fs.writeFileSync(path.join(ART, "cinema-classic-diff.json"), JSON.stringify(counts, null, 2));

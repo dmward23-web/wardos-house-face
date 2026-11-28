@@ -272,7 +272,12 @@ def main():
               timeX: textBox(time) ? textBox(time).l : null,
               moreX: textBox(moreEl) ? textBox(moreEl).l : null,
               rowX: box(row) ? box(row).l : null,
-              padL: row ? getComputedStyle(row).paddingLeft : ""
+              padL: row ? getComputedStyle(row).paddingLeft : "",
+              rowBoxes: [...document.querySelectorAll('.today-day li.leaveby-row:not([hidden])')].map((el) => ({
+                isNext: el.classList.contains('is-next'),
+                rowBox: box(el),
+                titleBox: box(el.querySelector('.leaveby-row-title'))
+              }))
             }
           };
         }""")
@@ -301,6 +306,32 @@ def main():
                     ink = list(p)
         slab["ink"] = ink
         slab["chip"] = at((rb.get("l") or 0) + 6, ((rb.get("t") or 0) + (rb.get("b") or 0)) / 2)
+
+        def brightest(box):
+            best = None
+            best_l = -1
+            x0, x1 = int(box.get("l") or 0), int(box.get("r") or 0)
+            y0, y1 = int(box.get("t") or 0), int(box.get("b") or 0)
+            for yy in range(max(0, y0), min(ih, max(y0, y1) + 1)):
+                for xx in range(max(0, x0), min(iw, max(x0, x1) + 1), 2):
+                    p = im.getpixel((xx, yy))
+                    L = 0.2126 * p[0] + 0.7152 * p[1] + 0.0722 * p[2]
+                    if L > best_l:
+                        best_l = L
+                        best = list(p)
+            return best
+
+        rows_out = []
+        for item in slab.get("rowBoxes") or []:
+            tbox = item.get("titleBox") or {}
+            rbox = item.get("rowBox") or {}
+            rows_out.append({
+                "ink": brightest(tbox),
+                "chip": at((rbox.get("l") or 0) + 6, ((rbox.get("t") or 0) + (rbox.get("b") or 0)) / 2),
+                "isNext": bool(item.get("isNext")),
+            })
+        slab["rows"] = rows_out
+        slab.pop("rowBoxes", None)
         fit["slab"] = slab
 
         open_page("/kid-hayes.html")

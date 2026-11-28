@@ -49,10 +49,13 @@ def main():
     with sync_playwright() as p:
         browser = p.chromium.launch(**launch_kw(p, headless=True))
         page = browser.new_page()
+        # paint() calls href() while arming. Count only the calls across pointerup plus click.
+        page.add_init_script("window.HouseAudit = { href: h => (window.__hrefCalls = (window.__hrefCalls || 0) + 1, h) };")
         page.goto(base, wait_until="load", timeout=30000)
         page.wait_for_function("() => document.querySelector('a[data-home-armed=\"1\"]')", timeout=8000)
         result = page.evaluate("""() => {
           const el = document.querySelector('a[data-kw-home]');
+          const hrefBefore = window.__hrefCalls || 0;
           const up = new PointerEvent('pointerup', { bubbles: true, cancelable: true, button: 0, pointerId: 1, pointerType: 'mouse' });
           el.dispatchEvent(up);
           let clickPrevented = null;
@@ -62,7 +65,8 @@ def main():
           /* pointerup's go() is the one assign. A click that is not cancelled follows the anchor too. */
           const fromPointer = up.defaultPrevented ? 1 : 0;
           const fromClick = clickPrevented ? 0 : 1;
-          return { pointerPrevented: up.defaultPrevented, clickPrevented: clickPrevented, navs: fromPointer + fromClick };
+          const hrefDelta = (window.__hrefCalls || 0) - hrefBefore;
+          return { pointerPrevented: up.defaultPrevented, clickPrevented: clickPrevented, navs: fromPointer + fromClick, hrefDelta: hrefDelta };
         }""")
         browser.close()
     httpd.shutdown()

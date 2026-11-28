@@ -76,6 +76,7 @@ test("HOMEONCE1 pointerup then click starts one navigation", { skip: spawnSync("
   const r = spawnSync("python3", [path.join(ROOT, "scripts/qa/homeonce1.py")], { encoding: "utf8", timeout: 60000 });
   assert.equal(r.status, 0, (r.stderr || "").slice(-600) + (r.stdout || "").slice(-400));
   const o = JSON.parse(r.stdout.trim().split("\n").pop());
+  assert.equal(o.hrefDelta, 1, JSON.stringify(o));
   assert.equal(o.navs, 1, JSON.stringify(o));
   assert.equal(o.pointerPrevented, true, JSON.stringify(o));
   assert.equal(o.clickPrevented, true, JSON.stringify(o));
